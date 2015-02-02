@@ -1,0 +1,30 @@
+<?php
+// module/Album/view/album/platform/index.phtml:
+
+$title = 'My Platforms';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<p>
+    <a href="<?php echo $this->url('platform', array('action' => 'add')); ?>"><?php echo $this->translate('Add new platform'); ?></a>
+</p>
+
+<table class="table">
+    <tr>
+        <th><?php echo $this->translate('Name'); ?></th>
+        <th><?php echo $this->translate('Description'); ?></th>
+        <th>&nbsp;</th>
+    </tr>
+    <?php foreach ($platforms as $platform) : ?>
+        <tr>
+            <td><?php echo $this->escapeHtml($platform->name); ?></td>
+            <td><?php echo $this->escapeHtml($platform->description); ?></td>
+            <td>
+                <a href="<?php echo $this->url('platform', array('action' => 'edit', 'id' => $platform->id));
+        ?>">Edit</a>
+                <a href="<?php echo $this->url('platform', array('action' => 'delete', 'id' => $platform->id));
+        ?>">Delete</a>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+</table>

@@ -1,0 +1,30 @@
+<?php
+// module/Album/view/album/shelve/index.phtml:
+
+$title = 'My Shelves';
+$this->headTitle($title);
+?>
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<p>
+    <a href="<?php echo $this->url('shelve', array('action' => 'add')); ?>"><?php echo $this->translate('Add new shelve'); ?></a>
+</p>
+
+<table class="table">
+    <tr>
+        <th><?php echo $this->translate('Name'); ?></th>
+        <th><?php echo $this->translate('Description'); ?></th>
+        <th>&nbsp;</th>
+    </tr>
+    <?php foreach ($shelves as $shelve) : ?>
+        <tr>
+            <td><?php echo $this->escapeHtml($shelve->name); ?></td>
+            <td><?php echo $this->escapeHtml($shelve->description); ?></td>
+            <td>
+                <a href="<?php echo $this->url('shelve', array('action' => 'edit', 'id' => $shelve->id));
+        ?>">Edit</a>
+                <a href="<?php echo $this->url('shelve', array('action' => 'delete', 'id' => $shelve->id));
+        ?>">Delete</a>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+</table>
