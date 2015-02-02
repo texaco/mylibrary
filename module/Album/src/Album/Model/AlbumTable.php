@@ -33,6 +33,21 @@ class AlbumTable {
         return $row;
     }
 
+    public function getAlbums($title, $artist) {
+        $select = $this->tableGateway->getSql()->select();
+        $where = $select->where;
+        $where->equalTo('title', $title);
+        $where->or;
+        $where->equalTo('artist', $artist);
+        
+        $rowset = $this->tableGateway->select($where);
+        $row = $rowset->current();
+        if (!$row) {
+            throw new \Exception("Could not find row with title $title");
+        }
+        return $row;
+    }
+
     public function saveAlbum(Album $album) {
         $data = array(
             'artist' => $album->artist,

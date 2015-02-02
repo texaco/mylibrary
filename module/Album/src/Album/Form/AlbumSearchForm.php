@@ -10,11 +10,11 @@ namespace Album\Form;
 
 use Zend\Form\Form;
 
-class AlbumForm extends Form {
+class AlbumSearchForm extends Form {
 
     public function __construct($name = null) {
         // we want to ignore the name passed
-        parent::__construct('album');
+        parent::__construct('albumSearch');
 
         $this->add(array(
             'name' => 'id',
@@ -60,20 +60,6 @@ class AlbumForm extends Form {
             'type' => 'Text',
             'options' => array(
                 'label' => 'Seen',
-            ),
-        ));
-        $this->add(array(
-            'name' => 'registerDate',
-            'type' => 'Text',
-            'options' => array(
-                'label' => 'Register Date',
-            ),
-        ));
-        $this->add(array(
-            'name' => 'editDate',
-            'type' => 'Text',
-            'options' => array(
-                'label' => 'Edit Date',
             ),
         ));
         
