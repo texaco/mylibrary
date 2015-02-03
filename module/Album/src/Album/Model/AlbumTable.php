@@ -33,34 +33,30 @@ class AlbumTable {
         return $row;
     }
 
-    public function getAlbums($title = '', $artist = '', $platform = '', $shelve = '', $seen = '') {
-        $select = $this->tableGateway->getSql()->select();
+    public function getAlbums($title = null, $artist = null, $platform = null, $shelve = null, $seen = null) {
 
-        var_dump($title);
-        echo $title != null;
-        echo '%' . ($title != null) ? $title : '' . '%';
-        $where = $select->where;
-        $where->like('title', '%' . ($title != null) ? $title : '' . '%');
-//        $where->or;
-//        $where->like('artist', '%' . ($artist != null) ? $artist : '' . '%');
-//        $where->or;
-//        $where->like('platform', '%' . ($platform != null) ? $platform : '' . '%');
-
-//        //        $where->or;
-//        $where->like('shelve', '%' . ($shelve != null) ? $shelve : '' . '%');
-//        $where->or;
-//        $where->like('seen', '%' . ($seen != null) ? $seen : '' . '%');
-
-        $rowset = $this->tableGateway->select($where);
-        echo $this->tableGateway->getSql()->getSqlStringForSqlObject($select);
-        $row = $rowset->current();
-        if (!$row) {
-            throw new \Exception("Could not find row with title $title");
+        if (!empty($title) or ! empty($artist) or ! empty($platform) or ! empty($shelve) or ! empty($seen)) {
+            $select = $this->tableGateway->getSql()->select();
+            $where = $select->where;
+            if (!empty($title)) {
+                $where->like('title', '%' . $title . '%');
+            }
+            if (!empty($artist)) {
+                $where->like('artist', '%' . $artist . '%');
+            }
+            if (!empty($platform)) {
+                $where->like('platform', '%' . $platform . '%');
+            }
+            if (!empty($shelve)) {
+                $where->like('shelve', '%' . $shelve . '%');
+            }
+            if (!empty($seen)) {
+                $where->like('seen', '%' . $seen . '%');
+            }
+            return $this->tableGateway->select($where);
+        } else {
+            return $this->fetchAll();
         }
-
-        var_dump($row);
-
-        return $row;
     }
 
     public function saveAlbum(Album $album) {

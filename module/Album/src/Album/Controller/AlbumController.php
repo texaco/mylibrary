@@ -158,21 +158,23 @@ class AlbumController extends AbstractActionController {
         $form->get('submit')->setValue('Search');
 
 
+        $form->get('shelve')->setEmptyOption('- No Selected -');
         $form->get('shelve')->setValueOptions($this->getShelveOptions());
+        $form->get('platform')->setEmptyOption('- No Selected -');
         $form->get('platform')->setValueOptions($this->getPlatformOptions());
 
         $request = $this->getRequest();
         if ($request->isPost()) {
 
             $form->setData($request->getPost());
-            $albums = $this->getAlbumTable()->getAlbums($form->get('title').getValue(), $form->get('artist'));
-            
+            $albums = $this->getAlbumTable()->getAlbums(
+                    $form->get('title')->getValue(), $form->get('artist')->getValue(), $form->get('platform')->getValue(), $form->get('shelve')->getValue(), $form->get('seen')->getValue());
         }
 
         if (!$albums) {
             $albums = $this->getAlbumTable()->fetchAll();
         }
-        
+
         return new ViewModel(array(
             'albums' => $albums,
             'form' => $form,
