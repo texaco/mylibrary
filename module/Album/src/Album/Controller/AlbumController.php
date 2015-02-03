@@ -163,19 +163,10 @@ class AlbumController extends AbstractActionController {
 
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $albums = $this->getAlbumTable()->getAlbums('infamous', 'test');
-            $form->get('submit')->setValue('Searched');
 
-            $album = new Album();
-            //$form->setInputFilter($album->getInputFilter());
             $form->setData($request->getPost());
-
-            if ($form->isValid()) {
-                $album->exchangeArray($form->getData());
-                // $this->getAlbumTable()->saveAlbum($album);
-                // Redirect to list of albums
-                // return $this->redirect()->toRoute('album');
-            }
+            $albums = $this->getAlbumTable()->getAlbums($form->get('title'), $form->get('artist'));
+            
         }
 
         if (!$albums) {

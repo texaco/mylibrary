@@ -33,19 +33,31 @@ class AlbumTable {
         return $row;
     }
 
-    public function getAlbums($title, $artist) {
+    public function getAlbums($title = '', $artist = '', $platform = '', $shelve = '', $seen = '') {
         $select = $this->tableGateway->getSql()->select();
-        
+
+        echo '%' . ($title != null) ? $title : '' . '%';
         $where = $select->where;
-        $where->like('title', '%'.$title.'%');
-        $where->or;
-        $where->like('artist', '%'.$artist.'%');
-        
+        $where->like('title', '%' . ($title != null) ? $title : '' . '%');
+//        $where->or;
+//        $where->like('artist', '%' . ($artist != null) ? $artist : '' . '%');
+//        $where->or;
+//        $where->like('platform', '%' . ($platform != null) ? $platform : '' . '%');
+
+//        //        $where->or;
+//        $where->like('shelve', '%' . ($shelve != null) ? $shelve : '' . '%');
+//        $where->or;
+//        $where->like('seen', '%' . ($seen != null) ? $seen : '' . '%');
+
         $rowset = $this->tableGateway->select($where);
+        echo $this->tableGateway->getSql()->getSqlStringForSqlObject($select);
         $row = $rowset->current();
         if (!$row) {
             throw new \Exception("Could not find row with title $title");
         }
+
+        var_dump($row);
+
         return $row;
     }
 
