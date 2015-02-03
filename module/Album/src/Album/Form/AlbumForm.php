@@ -62,21 +62,7 @@ class AlbumForm extends Form {
                 'label' => 'Seen',
             ),
         ));
-        $this->add(array(
-            'name' => 'registerDate',
-            'type' => 'Text',
-            'options' => array(
-                'label' => 'Register Date',
-            ),
-        ));
-        $this->add(array(
-            'name' => 'editDate',
-            'type' => 'Text',
-            'options' => array(
-                'label' => 'Edit Date',
-            ),
-        ));
-        
+
         $this->add(array(
             'name' => 'submit',
             'type' => 'Submit',

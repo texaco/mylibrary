@@ -6,6 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Album\Model\Album;
 use Album\Form\AlbumForm;
+use Album\Form\AlbumSearchForm;
 
 class AlbumController extends AbstractActionController {
 
@@ -153,8 +154,37 @@ class AlbumController extends AbstractActionController {
     }
 
     public function indexAction() {
+        $form = new AlbumSearchForm();
+        $form->get('submit')->setValue('Search');
+
+
+        $form->get('shelve')->setValueOptions($this->getShelveOptions());
+        $form->get('platform')->setValueOptions($this->getPlatformOptions());
+
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $albums = $this->getAlbumTable()->getAlbums('infamous', 'test');
+            $form->get('submit')->setValue('Searched');
+
+            $album = new Album();
+            //$form->setInputFilter($album->getInputFilter());
+            $form->setData($request->getPost());
+
+            if ($form->isValid()) {
+                $album->exchangeArray($form->getData());
+                // $this->getAlbumTable()->saveAlbum($album);
+                // Redirect to list of albums
+                // return $this->redirect()->toRoute('album');
+            }
+        }
+
+        if (!$albums) {
+            $albums = $this->getAlbumTable()->fetchAll();
+        }
+        
         return new ViewModel(array(
-            'albums' => $this->getAlbumTable()->fetchAll(),
+            'albums' => $albums,
+            'form' => $form,
         ));
     }
 

@@ -35,10 +35,11 @@ class AlbumTable {
 
     public function getAlbums($title, $artist) {
         $select = $this->tableGateway->getSql()->select();
+        
         $where = $select->where;
-        $where->equalTo('title', $title);
+        $where->like('title', '%'.$title.'%');
         $where->or;
-        $where->equalTo('artist', $artist);
+        $where->like('artist', '%'.$artist.'%');
         
         $rowset = $this->tableGateway->select($where);
         $row = $rowset->current();
