@@ -165,7 +165,7 @@ class AlbumController extends AbstractActionController {
         if ($request->isPost()) {
 
             $form->setData($request->getPost());
-            $albums = $this->getAlbumTable()->getAlbums($form->get('title'), $form->get('artist'));
+            $albums = $this->getAlbumTable()->getAlbums($form->get('title').getValue(), $form->get('artist'));
             
         }
 

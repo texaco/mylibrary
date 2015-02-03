@@ -36,6 +36,8 @@ class AlbumTable {
     public function getAlbums($title = '', $artist = '', $platform = '', $shelve = '', $seen = '') {
         $select = $this->tableGateway->getSql()->select();
 
+        var_dump($title);
+        echo $title != null;
         echo '%' . ($title != null) ? $title : '' . '%';
         $where = $select->where;
         $where->like('title', '%' . ($title != null) ? $title : '' . '%');
