@@ -61,6 +61,7 @@ class AlbumController extends AbstractActionController {
     public function addAction() {
         $form = new AlbumForm();
         $form->get('submit')->setValue('Add');
+        $form->get('submitAndContinue')->setValue('Add and Continue');
 
 
         $form->get('shelve')->setValueOptions($this->getShelveOptions());
@@ -76,13 +77,20 @@ class AlbumController extends AbstractActionController {
                 $album->exchangeArray($form->getData());
                 $this->getAlbumTable()->saveAlbum($album);
 
-                // Redirect to list of albums
-                return $this->redirect()->toRoute('album');
+                if ($request->getPost('submit') != null) {
+                    return $this->redirect()->toRoute('album');
+                }
             }
         }
 
+        //The form is reset in order to be empty
+        $form = new AlbumForm();
+        $form->get('submit')->setValue('Add');
+        $form->get('submitAndContinue')->setValue('Add and Continue');
+        $form->get('shelve')->setValueOptions($this->getShelveOptions());
+        $form->get('platform')->setValueOptions($this->getPlatformOptions());
 
-        return array('form' => $form, 'shelves' => $shelves);
+        return array('form' => $form);
     }
 
     public function editAction() {

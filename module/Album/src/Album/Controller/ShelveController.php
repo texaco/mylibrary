@@ -22,6 +22,7 @@ class ShelveController extends AbstractActionController {
     public function addAction() {
         $form = new ShelveForm();
         $form->get('submit')->setValue('Add');
+        $form->get('submitAndContinue')->setValue('Add and Continue');
 
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -34,9 +35,15 @@ class ShelveController extends AbstractActionController {
                 $this->getShelveTable()->saveShelve($shelve);
 
                 // Redirect to list of albums
-                return $this->redirect()->toRoute('shelve');
+                if ($request->getPost('submit') != null) {
+                    return $this->redirect()->toRoute('shelve');
+                }
             }
         }
+        $form = new ShelveForm();
+        $form->get('submit')->setValue('Add');
+        $form->get('submitAndContinue')->setValue('Add and Continue');
+
         return array('form' => $form);
     }
 

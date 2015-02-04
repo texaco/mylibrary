@@ -71,6 +71,15 @@ class AlbumForm extends Form {
                 'id' => 'submitbutton',
             ),
         ));
+
+        $this->add(array(
+            'name' => 'submitAndContinue',
+            'type' => 'Submit',
+            'attributes' => array(
+                'value' => 'Save and Continue',
+                'id' => 'submitAndContinueButton',
+            ),
+        ));
     }
 
 }

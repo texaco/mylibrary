@@ -22,6 +22,7 @@ class PlatformController extends AbstractActionController {
     public function addAction() {
         $form = new PlatformForm();
         $form->get('submit')->setValue('Add');
+        $form->get('submitAndContinue')->setValue('Add and Continue');
 
         $request = $this->getRequest();
         if ($request->isPost()) {
@@ -34,9 +35,16 @@ class PlatformController extends AbstractActionController {
                 $this->getPlatformTable()->savePlatform($platform);
 
                 // Redirect to list of albums
-                return $this->redirect()->toRoute('platform');
+                if ($request->getPost('submit') != null) {
+                    return $this->redirect()->toRoute('platform');
+                }
             }
         }
+
+        $form = new PlatformForm();
+        $form->get('submit')->setValue('Add');
+        $form->get('submitAndContinue')->setValue('Add and Continue');
+        
         return array('form' => $form);
     }
 

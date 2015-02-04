@@ -34,12 +34,21 @@ class ShelveForm extends Form {
                 'label' => 'Description',
             ),
         ));
-        
+
         $this->add(array(
             'name' => 'submit',
             'type' => 'Submit',
             'attributes' => array(
                 'value' => 'Go',
+                'id' => 'submitbutton',
+            ),
+        ));
+
+        $this->add(array(
+            'name' => 'submitAndContinue',
+            'type' => 'Submit',
+            'attributes' => array(
+                'value' => 'Save and Continue',
                 'id' => 'submitbutton',
             ),
         ));
