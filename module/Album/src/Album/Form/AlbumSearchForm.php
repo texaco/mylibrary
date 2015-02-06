@@ -26,12 +26,18 @@ class AlbumSearchForm extends Form {
             'options' => array(
                 'label' => 'Title',
             ),
+            'attributes' => array(
+                'class' => 'form-control',
+            ),
         ));
         $this->add(array(
             'name' => 'artist',
             'type' => 'Text',
             'options' => array(
                 'label' => 'Artist',
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
             ),
         ));
         $this->add(array(
@@ -40,12 +46,22 @@ class AlbumSearchForm extends Form {
             'options' => array(
                 'label' => 'Platform',
             ),
+            'attributes' => array(
+                'style' => 'display: none',
+                'class' => 'form-control selectpicker',
+                'data-live-search' => 'true',
+            ),
         ));
         $this->add(array(
             'name' => 'shelve',
             'type' => 'Select',
             'options' => array(
                 'label' => 'Shelve',
+            ),
+            'attributes' => array(
+                'style' => 'display: none',
+                'class' => 'selectpicker form-control',
+                'data-live-search' => 'true',
             ),
         ));
         $this->add(array(
@@ -54,12 +70,18 @@ class AlbumSearchForm extends Form {
             'options' => array(
                 'label' => 'Cover',
             ),
+            'attributes' => array(
+                'class' => 'form-control',
+            ),
         ));
         $this->add(array(
             'name' => 'seen',
             'type' => 'Text',
             'options' => array(
                 'label' => 'Seen',
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
             ),
         ));
         
@@ -69,6 +91,7 @@ class AlbumSearchForm extends Form {
             'attributes' => array(
                 'value' => 'Go',
                 'id' => 'submitbutton',
+                'class' => 'btn btn-default',
             ),
         ));
     }

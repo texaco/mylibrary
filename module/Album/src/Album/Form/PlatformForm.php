@@ -26,12 +26,18 @@ class PlatformForm extends Form {
             'options' => array(
                 'label' => 'Name',
             ),
+            'attributes' => array(
+                'class' => 'form-control',
+            ),
         ));
         $this->add(array(
             'name' => 'description',
             'type' => 'Text',
             'options' => array(
                 'label' => 'Description',
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
             ),
         ));
         
@@ -41,6 +47,7 @@ class PlatformForm extends Form {
             'attributes' => array(
                 'value' => 'Go',
                 'id' => 'submitbutton',
+                'class' => 'btn btn-default',
             ),
         ));
 
@@ -50,6 +57,7 @@ class PlatformForm extends Form {
             'attributes' => array(
                 'value' => 'Save and Continue',
                 'id' => 'submitbutton',
+                'class' => 'btn btn-default',
             ),
         ));
     }
