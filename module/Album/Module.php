@@ -69,6 +69,11 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface {
                     return new TableGateway('platform', $dbAdapter, null, $resultSetPrototype);
                 },
             ),
+            'invokables' => array(
+                // Keys are the service names
+                // Values are valid class names to instantiate.
+                'Album\Service\DataTable' => 'Album\Service\DataTable',
+            ),  
         );
     }
 

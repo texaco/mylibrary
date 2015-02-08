@@ -1,6 +1,11 @@
 <?php
 
 return array(
+    'service_manager' => array(
+        'invokables' => array(
+            'Album\Service\DataTableInterface' => 'Album\Service\DataTable'
+        )
+    ),
     'controllers' => array(
         'invokables' => array(
             'Album\Controller\Album' => 'Album\Controller\AlbumController',

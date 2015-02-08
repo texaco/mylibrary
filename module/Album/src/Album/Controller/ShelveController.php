@@ -7,10 +7,12 @@ use Zend\View\Model\ViewModel;
 use Album\Model\Shelve;
 use Album\Form\ShelveForm;
 use Zend\View\Model\JsonModel;
+use Album\Service\DataTableInteface;
 
 class ShelveController extends AbstractActionController {
 
     protected $shelveTable;
+    protected $dataTableService;
 
     public function getShelveTable() {
         if (!$this->shelveTable) {
@@ -264,11 +266,7 @@ class ShelveController extends AbstractActionController {
          * server-side, there is no need to edit below this line.
          */
 
-        require( 'ssp.class.php' );
-
-        echo json_encode(
-                SSP::simple($_GET, $sql_details, $table, $primaryKey, $columns)
-        );
+        echo json_encode($this->getDataTable()->simple($_GET, $sql_details, $table, $primaryKey, $columns));
     }
 
     public function testAction() {
@@ -277,4 +275,12 @@ class ShelveController extends AbstractActionController {
         ));
     }
 
+    public function getDataTable()
+    {
+        if (!$this->dataTableService) {
+            $sm = $this->getServiceLocator();
+            $this->dataTableService = $sm->get('Album\Service\DataTableInterface');
+        }
+        return $this->dataTableService;
+    }
 }

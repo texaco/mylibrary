@@ -14,7 +14,12 @@
  *
  * @license MIT - http://datatables.net/license_mit
  */
-class SSP {
+namespace Album\Service;
+
+use Album\Service\DataTableInterface;
+
+class DataTable implements DataTableInterface
+{
 
     /**
      * Create the data output array for the DataTables rows
@@ -304,8 +309,8 @@ FROM `$table` " .
      */
     static function sql_connect($sql_details) {
         try {
-            $db = @new PDO(
-                    "mysql:host={$sql_details['host']};dbname={$sql_details['db']}", $sql_details['user'], $sql_details['pass'], array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
+            $db = @new \Zend\Db\Adapter\Driver\Pdo\Pdo(
+                    "mysql:host={$sql_details['host']};dbname={$sql_details['db']}", $sql_details['user'], $sql_details['pass'], array(\Zend\Db\Adapter\Driver\Pdo\Pdo::ATTR_ERRMODE => \Zend\Db\Adapter\Driver\Pdo\Pdo::ERRMODE_EXCEPTION)
             );
         } catch (PDOException $e) {
             self::fatal(
