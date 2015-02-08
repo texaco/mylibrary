@@ -14,6 +14,19 @@ class AlbumController extends AbstractActionController {
     protected $shelveTable;
     protected $platformTable;
 
+    private function get_array_unique_search($albums){
+        $titles = array();
+        $artists = array();
+        $seens = array();
+
+        foreach($albums as $album){
+            $titles[] = $album->title;
+            $artists[] = $album->artist;
+            $seens[] = $album->seen;
+        }
+        return array('titles' => array_unique($titles), 'artists' => array_unique($artists), 'seens' => array_unique($seens),);
+    }
+    
     public function getAlbumTable() {
         if (!$this->albumTable) {
             $sm = $this->getServiceLocator();
@@ -90,7 +103,12 @@ class AlbumController extends AbstractActionController {
         $form->get('shelve')->setValueOptions($this->getShelveOptions());
         $form->get('platform')->setValueOptions($this->getPlatformOptions());
 
-        return array('form' => $form);
+        $albums = $this->getAlbumTable()->fetchAll();
+        $search_array = $this->get_array_unique_search($albums);
+        
+        return array('form' => $form,
+            'search_array' => $search_array,
+            );
     }
 
     public function editAction() {
@@ -130,9 +148,13 @@ class AlbumController extends AbstractActionController {
             }
         }
 
+        $albums = $this->getAlbumTable()->fetchAll();
+        $search_array = $this->get_array_unique_search($albums);
+
         return array(
             'id' => $id,
             'form' => $form,
+            'search_array' => $search_array,
         );
     }
 
@@ -179,13 +201,18 @@ class AlbumController extends AbstractActionController {
                     $form->get('title')->getValue(), $form->get('artist')->getValue(), $form->get('platform')->getValue(), $form->get('shelve')->getValue(), $form->get('seen')->getValue());
         }
 
-        if (!$albums) {
+        if (!isset($albums)) {
             $albums = $this->getAlbumTable()->fetchAll();
         }
 
+        $albums->buffer();
+        
+        $search_array = $this->get_array_unique_search($albums);
+        
         return new ViewModel(array(
             'albums' => $albums,
             'form' => $form,
+            'search_array' => $search_array,
         ));
     }
 

@@ -27,6 +27,7 @@ class AlbumForm extends Form {
                 'label' => 'Title',
             ),
             'attributes' => array(
+                'id' => 'title',
                 'class' => 'form-control',
             ),
         ));
@@ -37,6 +38,7 @@ class AlbumForm extends Form {
                 'label' => 'Artist',
             ),
             'attributes' => array(
+                'id' => 'artist',
                 'class' => 'form-control',
             ),
         ));
@@ -81,6 +83,7 @@ class AlbumForm extends Form {
                 'label' => 'Seen',
             ),
             'attributes' => array(
+                'id' => 'seen',
                 'class' => 'form-control',
             ),
         ));

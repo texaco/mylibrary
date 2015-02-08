@@ -4,6 +4,36 @@
 $title = 'Add new album';
 $this->headTitle($title);
 ?>
+<script>
+     $(function() {
+        var availableTitles = [
+            <?php foreach ($search_array['titles'] as $albumTitle) :?>
+            "<?php echo $albumTitle ?>",
+            <?php endforeach;?>
+        ];
+        var availableArtists = [
+            <?php foreach ($search_array['artists'] as $albumArtist) :?>
+            "<?php echo $albumArtist ?>",
+            <?php endforeach;?>
+        ];
+        var availableSeens = [
+            <?php foreach ($search_array['seens'] as $albumSeens) :?>
+            "<?php echo $albumSeens ?>",
+            <?php endforeach;?>
+        ];
+        $("#title").autocomplete({
+            source: availableTitles
+        });
+        $("#artist").autocomplete({
+            source: availableArtists
+        });
+        $("#seen").autocomplete({
+            source: availableSeens
+        });
+    });
+</script>
+
+
 <h1><?php echo $this->escapeHtml($title); ?></h1>
 <?php
 $form->setAttribute('action', $this->url('album', array('action' => 'add')));
