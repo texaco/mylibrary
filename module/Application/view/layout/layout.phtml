@@ -11,6 +11,7 @@
         ?>
         <!-- Le styles -->
         <?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'))
+                        ->prependStylesheet('//cdn.datatables.net/1.10.4/css/jquery.dataTables.css')
                         ->prependStylesheet('//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/css/bootstrap-select.min.css')
                         ->prependStylesheet($this->basePath() . '/css/style.css')
                         ->prependStylesheet($this->basePath() . '/css/bootstrap-theme.min.css')
@@ -20,6 +21,7 @@
 
         <!-- Scripts -->
         <?php echo $this->headScript()
+            ->prependFile('//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js')
             ->prependFile('//code.jquery.com/ui/1.11.2/jquery-ui.js')
             ->prependFile('//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js')
             ->prependFile($this->basePath() . '/js/bootstrap.min.js')
