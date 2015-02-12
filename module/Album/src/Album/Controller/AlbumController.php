@@ -6,13 +6,22 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Album\Model\Album;
 use Album\Form\AlbumForm;
-use Album\Form\AlbumSearchForm;
+use Zend\View\Model\JsonModel;
 
 class AlbumController extends AbstractActionController {
 
     protected $albumTable;
     protected $shelveTable;
     protected $platformTable;
+
+    public function getDataTable()
+    {
+        if (!$this->dataTableService) {
+            $sm = $this->getServiceLocator();
+            $this->dataTableService = $sm->get('Album\Service\DataTableInterface');
+        }
+        return $this->dataTableService;
+    }
 
     private function get_array_unique_search($albums){
         $titles = array();
@@ -184,36 +193,72 @@ class AlbumController extends AbstractActionController {
     }
 
     public function indexAction() {
-        $form = new AlbumSearchForm();
-        $form->get('submit')->setValue('Search');
-
-
-        $form->get('shelve')->setEmptyOption('- No Selected -');
-        $form->get('shelve')->setValueOptions($this->getShelveOptions());
-        $form->get('platform')->setEmptyOption('- No Selected -');
-        $form->get('platform')->setValueOptions($this->getPlatformOptions());
-
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-
-            $form->setData($request->getPost());
-            $albums = $this->getAlbumTable()->getAlbums(
-                    $form->get('title')->getValue(), $form->get('artist')->getValue(), $form->get('platform')->getValue(), $form->get('shelve')->getValue(), $form->get('seen')->getValue());
-        }
-
-        if (!isset($albums)) {
-            $albums = $this->getAlbumTable()->fetchAll();
-        }
-
-        $albums->buffer();
         
-        $search_array = $this->get_array_unique_search($albums);
+        return new ViewModel();
+    }
+    
+    public function indexAjaxAction(){
+                /*
+         * DataTables example server-side processing script.
+         *
+         * Please note that this script is intentionally extremely simply to show how
+         * server-side processing can be implemented, and probably shouldn't be used as
+         * the basis for a large complex system. It is suitable for simple use cases as
+         * for learning.
+         *
+         * See http://datatables.net/usage/server-side for full details on the server-
+         * side processing requirements of DataTables.
+         *
+         * @license MIT - http://datatables.net/license_mit
+         */
+
+        /*         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         * Easy set variables
+         */
+
+// DB table to use
+        $table = 'album';
+
+// Table's primary key
+        $primaryKey = 'id';
+
+// Array of database columns which should be read and sent back to DataTables.
+// The `db` parameter represents the column name in the database, while the `dt`
+// parameter represents the DataTables column identifier. In this case simple
+// indexes
+        $columns = array(
+            array('db' => 'title', 'dt' => 0),
+            array('db' => 'artist', 'dt' => 1),
+            array('db' => 'platform', 'dt' => 2),
+            array('db' => 'shelve', 'dt' => 3),
+            array('db' => 'cover', 'dt' => 4),
+            array('db' => 'seen', 'dt' => 5),
+            array('db' => 'registerDate', 'dt' => 6),
+            array('db' => 'editDate', 'dt' => 7),
+        );
+
+        $config = $this->getServiceLocator()->get('Config');
         
-        return new ViewModel(array(
-            'albums' => $albums,
-            'form' => $form,
-            'search_array' => $search_array,
-        ));
+        $sql_details = array(
+            'user' => $config['db']['username'],
+            'pass' => $config['db']['password'],
+            'db' => 'mjrojase_mylibrary',
+            'host' => 'localhost'
+        );
+
+
+        /*         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         * If you just want to use the basic configuration for DataTables with PHP
+         * server-side, there is no need to edit below this line.
+         */
+
+        $return = $this->getDataTable()->simple($this->params()->fromQuery(), $sql_details, $table, $primaryKey, $columns);
+        foreach ($return['data'] as &$item){
+            foreach ($item as &$i)
+            $i = utf8_encode($i);
+        }
+        return new JsonModel($return);
+
     }
 
 }

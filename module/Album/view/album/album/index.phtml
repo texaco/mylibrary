@@ -5,82 +5,47 @@ $title = 'My albums';
 $this->headTitle($title);
 ?>
 <script>
-     $(function() {
-        var availableTitles = [
-            <?php foreach ($search_array['titles'] as $albumTitle) :?>
-            "<?php echo $albumTitle ?>",
-            <?php endforeach;?>
-        ];
-        var availableArtists = [
-            <?php foreach ($search_array['artists'] as $albumArtist) :?>
-            "<?php echo $albumArtist ?>",
-            <?php endforeach;?>
-        ];
-        var availableSeens = [
-            <?php foreach ($search_array['seens'] as $albumSeens) :?>
-            "<?php echo $albumSeens ?>",
-            <?php endforeach;?>
-        ];
-        $("#title").autocomplete({
-            source: availableTitles
-        });
-        $("#artist").autocomplete({
-            source: availableArtists
-        });
-        $("#seen").autocomplete({
-            source: availableSeens
-        });
-    });
+$(document).ready(function() {
+    $('#albumTable').dataTable( {
+        "processing": true,
+        "serverSide": true,
+        "ajax": "<?php echo $this->url('album', array('action' => 'indexAjax'));?>"
+    } );
+} );
 </script>
 <h1><?php echo $this->escapeHtml($title); ?></h1>
 <p>
     <a href="<?php echo $this->url('album', array('action' => 'add')); ?>"><?php echo $this->translate('Add new album'); ?></a>
 </p>
-<p> 
-    <?php
-    $form->setAttribute('index', $this->url('album', array('action' => 'index')));
-    $form->prepare();
-
-    echo $this->form()->openTag($form);
-
-//echo $this->formHidden($form->get('id'));
-//echo $this->formRow($form->get('title'));
-//echo $this->formRow($form->get('artist'));
-//echo $this->formSubmit($form->get('submit'));
-
-    echo $this->formCollection($form);
-
-    echo $this->form()->closeTag();
-    ?>
-</p>
-<table class="table">
-    <tr>
-        <th><?php echo $this->translate('Title'); ?></th>
-        <th><?php echo $this->translate('Artist'); ?></th>
-        <th><?php echo $this->translate('Platform'); ?></th>
-        <th><?php echo $this->translate('Shelve'); ?></th>
-        <th><?php echo $this->translate('Cover'); ?></th>
-        <th><?php echo $this->translate('Seen'); ?></th>
-        <th><?php echo $this->translate('Register Date'); ?></th>
-        <th><?php echo $this->translate('Edit Date'); ?></th>
-        <th>&nbsp;</th>
-    </tr>
-    <?php foreach ($albums as $album) : ?>
+<table id="albumTable" class="table">
+    <thead>
         <tr>
-            <td><?php echo $this->escapeHtml($album->title); ?></td>
-            <td><?php echo $this->escapeHtml($album->artist); ?></td>
-            <td><?php echo $this->escapeHtml($album->platform); ?></td>
-            <td><?php echo $this->escapeHtml($album->shelve); ?></td>
-            <td><?php echo $this->escapeHtml($album->cover); ?></td>
-            <td><?php echo $this->escapeHtml($album->seen); ?></td>
-            <td><?php echo $this->escapeHtml($album->registerDate); ?></td>
-            <td><?php echo $this->escapeHtml($album->editDate); ?></td>
-            <td>
-                <a href="<?php echo $this->url('album', array('action' => 'edit', 'id' => $album->id));
-        ?>">Edit</a>
-                <a href="<?php echo $this->url('album', array('action' => 'delete', 'id' => $album->id));
-        ?>">Delete</a>
-            </td>
+            <th><?php echo $this->translate('Title'); ?></th>
+            <th><?php echo $this->translate('Artist'); ?></th>
+            <th><?php echo $this->translate('Platform'); ?></th>
+            <th><?php echo $this->translate('Shelve'); ?></th>
+            <th><?php echo $this->translate('Cover'); ?></th>
+            <th><?php echo $this->translate('Seen'); ?></th>
+            <th><?php echo $this->translate('Register Date'); ?></th>
+            <th><?php echo $this->translate('Edit Date'); ?></th>
+            <!-- 
+            <th>&nbsp;</th>
+            -->
         </tr>
-    <?php endforeach; ?>
+    </thead>
+    <tfoot>
+        <tr>
+            <th><?php echo $this->translate('Title'); ?></th>
+            <th><?php echo $this->translate('Artist'); ?></th>
+            <th><?php echo $this->translate('Platform'); ?></th>
+            <th><?php echo $this->translate('Shelve'); ?></th>
+            <th><?php echo $this->translate('Cover'); ?></th>
+            <th><?php echo $this->translate('Seen'); ?></th>
+            <th><?php echo $this->translate('Register Date'); ?></th>
+            <th><?php echo $this->translate('Edit Date'); ?></th>
+            <!-- 
+            <th>&nbsp;</th>
+            -->
+        </tr>
+    </tfoot>
 </table>

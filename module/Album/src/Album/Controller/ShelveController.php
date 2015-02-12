@@ -7,7 +7,6 @@ use Zend\View\Model\ViewModel;
 use Album\Model\Shelve;
 use Album\Form\ShelveForm;
 use Zend\View\Model\JsonModel;
-use Album\Service\DataTableInteface;
 
 class ShelveController extends AbstractActionController {
 
