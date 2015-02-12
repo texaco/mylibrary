@@ -266,7 +266,32 @@ class ShelveController extends AbstractActionController {
          * server-side, there is no need to edit below this line.
          */
 
-        echo json_encode($this->getDataTable()->simple($_GET, $sql_details, $table, $primaryKey, $columns));
+        //echo json_encode($this->getDataTable()->simple($_GET, $sql_details, $table, $primaryKey, $columns));
+        //$result = new JsonModel(array(
+//            'some_parameter' => 'some value',
+  //          'success' => true,
+    //    ));
+//        echo 'get: ';
+//        var_dump($this->params()->fromQuery());
+//        echo 'sql_details: ';
+//        var_dump($sql_details);
+//        echo 'table: ' . $table;
+//        echo 'primaryKey: ' . $primaryKey;
+//        echo 'columns: ';
+//        var_dump($columns);
+
+        //return new JsonModel($this->getDataTable()->simple($_GET, $sql_details, $table, $primaryKey, $columns));
+        $return = $this->getDataTable()->simple($this->params()->fromQuery(), $sql_details, $table, $primaryKey, $columns);
+        //var_dump($return);
+        $response = $this->getResponse();
+        $response->setContent(\Zend\Json\Json::encode($return));
+        //array(4) { ["draw"]=> int(1) ["recordsTotal"]=> int(21) ["recordsFiltered"]=> int(21) ["data"]=> array(10) { [0]=> array(2) { [0]=> string(6) "Barrio" [1]=> string(23) "Fernando León de Aranoa" } [1]=> array(2) { [0]=> string(24) "Canción de Hielo y Fuego" [1]=> string(16) "George RR Martin" } [2]=> array(2) { [0]=> string(21) "Destino de caballeros" [1]=> string(15) "Brian Helgeland" } [3]=> array(2) { [0]=> string(23) "Dragon Age: Inquisition" [1]=> string(7) "Blizard" } [4]=> array(2) { [0]=> string(7) "El bola" [1]=> string(12) "Achero Mañas" } [5]=> array(2) { [0]=> string(19) "El día de la bestia" [1]=> string(18) "Álex de la Iglesia" } [6]=> array(2) { [0]=> string(31) "Epic Mickey 2: The Power Of Two" [1]=> string(6) "Disney" } [7]=> array(2) { [0]=> string(42) "Fragile Dreams: Farewell Ruins of the Moon" [1]=> string(5) "Namco" } [8]=> array(2) { [0]=> string(28) "Harry Potter: Deadly Hallows" [1]=> string(5) "Harry" } [9]=> array(2) { [0]=> string(32) "Harry Potter: La orden del fenix" [1]=> string(5) "harry" } } } 
+        //return $result;
+        $returnJson = new JsonModel(array($return));
+        //var_dump($returnJson);
+        //return $returnJson;
+        return $response;
+        //return json_encode($return);
     }
 
     public function testAction() {
