@@ -123,101 +123,6 @@ class ShelveController extends AbstractActionController {
     }
 
     public function indextestAction() {
-        $json_array = array("draw" => 1,
-            "recordsTotal" => 57,
-            "recordsFiltered" => 57,
-            "data" => array(
-                array(
-                    "Airi",
-                    "Satou",
-                    "Accountant",
-                    "Tokyo",
-                    "28th Nov 08",
-                    "$162,700"
-                ),
-                array(
-                    "Angelica",
-                    "Ramos",
-                    "Chief Executive Officer (CEO)",
-                    "London",
-                    "9th Oct 09",
-                    "$1,200,000"
-                ),
-                array(
-                    "Ashton",
-                    "Cox",
-                    "Junior Technical Author",
-                    "San Francisco",
-                    "12th Jan 09",
-                    "$86,000"
-                ),
-                array(
-                    "Bradley",
-                    "Greer",
-                    "Software Engineer",
-                    "London",
-                    "13th Oct 12",
-                    "$132,000"
-                ),
-                array(
-                    "Brenden",
-                    "Wagner",
-                    "Software Engineer",
-                    "San Francisco",
-                    "7th Jun 11",
-                    "$206,850"
-                ),
-                array(
-                    "Brielle",
-                    "Williamson",
-                    "Integration Specialist",
-                    "New York",
-                    "2nd Dec 12",
-                    "$372,000"
-                ),
-                array(
-                    "Bruno",
-                    "Nash",
-                    "Software Engineer",
-                    "London",
-                    "3rd May 11",
-                    "$163,500"
-                ),
-                array(
-                    "Caesar",
-                    "Vance",
-                    "Pre-Sales Support",
-                    "New York",
-                    "12th Dec 11",
-                    "$106,450"
-                ),
-                array(
-                    "Cara",
-                    "Stevens",
-                    "Sales Assistant",
-                    "New York",
-                    "6th Dec 11",
-                    "$145,600"
-                ),
-                array(
-                    "Cedric",
-                    "Kelly",
-                    "Senior Javascript Developer",
-                    "Edinburgh",
-                    "29th Mar 12",
-                    "$433,060"
-                ),
-        ));
-
-
-        $result = new JsonModel(array(
-            'some_parameter' => 'some value',
-            'success' => true,
-        ));
-
-        //return new JsonModel($json_array);
-        //return $result;
-
         /*
          * DataTables example server-side processing script.
          *
@@ -251,14 +156,14 @@ class ShelveController extends AbstractActionController {
             array('db' => 'artist', 'dt' => 1),
         );
 
-// SQL server connection information BORRAR
+        $config = $this->getServiceLocator()->get('Config');
+        
         $sql_details = array(
-            'user' => 'mjrojase_mylibra',
-            'pass' => 'wWqw1WqvOujBs5BorhUD',
+            'user' => $config['db']['username'],
+            'pass' => $config['db']['password'],
             'db' => 'mjrojase_mylibrary',
             'host' => 'localhost'
         );
-// SQL server connection information BORRAR
 
 
         /*         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -266,32 +171,12 @@ class ShelveController extends AbstractActionController {
          * server-side, there is no need to edit below this line.
          */
 
-        //echo json_encode($this->getDataTable()->simple($_GET, $sql_details, $table, $primaryKey, $columns));
-        //$result = new JsonModel(array(
-//            'some_parameter' => 'some value',
-  //          'success' => true,
-    //    ));
-//        echo 'get: ';
-//        var_dump($this->params()->fromQuery());
-//        echo 'sql_details: ';
-//        var_dump($sql_details);
-//        echo 'table: ' . $table;
-//        echo 'primaryKey: ' . $primaryKey;
-//        echo 'columns: ';
-//        var_dump($columns);
-
-        //return new JsonModel($this->getDataTable()->simple($_GET, $sql_details, $table, $primaryKey, $columns));
         $return = $this->getDataTable()->simple($this->params()->fromQuery(), $sql_details, $table, $primaryKey, $columns);
-        //var_dump($return);
-        $response = $this->getResponse();
-        $response->setContent(\Zend\Json\Json::encode($return));
-        //array(4) { ["draw"]=> int(1) ["recordsTotal"]=> int(21) ["recordsFiltered"]=> int(21) ["data"]=> array(10) { [0]=> array(2) { [0]=> string(6) "Barrio" [1]=> string(23) "Fernando León de Aranoa" } [1]=> array(2) { [0]=> string(24) "Canción de Hielo y Fuego" [1]=> string(16) "George RR Martin" } [2]=> array(2) { [0]=> string(21) "Destino de caballeros" [1]=> string(15) "Brian Helgeland" } [3]=> array(2) { [0]=> string(23) "Dragon Age: Inquisition" [1]=> string(7) "Blizard" } [4]=> array(2) { [0]=> string(7) "El bola" [1]=> string(12) "Achero Mañas" } [5]=> array(2) { [0]=> string(19) "El día de la bestia" [1]=> string(18) "Álex de la Iglesia" } [6]=> array(2) { [0]=> string(31) "Epic Mickey 2: The Power Of Two" [1]=> string(6) "Disney" } [7]=> array(2) { [0]=> string(42) "Fragile Dreams: Farewell Ruins of the Moon" [1]=> string(5) "Namco" } [8]=> array(2) { [0]=> string(28) "Harry Potter: Deadly Hallows" [1]=> string(5) "Harry" } [9]=> array(2) { [0]=> string(32) "Harry Potter: La orden del fenix" [1]=> string(5) "harry" } } } 
-        //return $result;
-        $returnJson = new JsonModel(array($return));
-        //var_dump($returnJson);
-        //return $returnJson;
-        return $response;
-        //return json_encode($return);
+        foreach ($return['data'] as &$item){
+            $item[0] = utf8_encode($item[0]);
+            $item[1] = utf8_encode($item[1]);
+        }
+        return new JsonModel($return);
     }
 
     public function testAction() {
