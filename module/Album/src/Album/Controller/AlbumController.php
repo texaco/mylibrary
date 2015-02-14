@@ -227,14 +227,15 @@ class AlbumController extends AbstractActionController {
 // parameter represents the DataTables column identifier. In this case simple
 // indexes
         $columns = array(
-            array('db' => 'title', 'dt' => 0),
-            array('db' => 'artist', 'dt' => 1),
-            array('db' => 'platform', 'dt' => 2),
-            array('db' => 'shelve', 'dt' => 3),
-            array('db' => 'cover', 'dt' => 4),
-            array('db' => 'seen', 'dt' => 5),
-            array('db' => 'registerDate', 'dt' => 6),
-            array('db' => 'editDate', 'dt' => 7),
+            array('db' => 'id', 'dt' => 0),
+            array('db' => 'cover', 'dt' => 1),
+            array('db' => 'title', 'dt' => 2),
+            array('db' => 'artist', 'dt' => 3),
+            array('db' => 'platform', 'dt' => 4),
+            array('db' => 'shelve', 'dt' => 5),
+            array('db' => 'seen', 'dt' => 6),
+            array('db' => 'registerDate', 'dt' => 7),
+            array('db' => 'editDate', 'dt' => 8),
         );
 
         $config = $this->getServiceLocator()->get('Config');

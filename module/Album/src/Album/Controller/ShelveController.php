@@ -121,7 +121,7 @@ class ShelveController extends AbstractActionController {
         ));
     }
 
-    public function indextestAction() {
+    public function indexAjaxAction() {
         /*
          * DataTables example server-side processing script.
          *
@@ -141,7 +141,7 @@ class ShelveController extends AbstractActionController {
          */
 
 // DB table to use
-        $table = 'album';
+        $table = 'shelve';
 
 // Table's primary key
         $primaryKey = 'id';
@@ -151,8 +151,9 @@ class ShelveController extends AbstractActionController {
 // parameter represents the DataTables column identifier. In this case simple
 // indexes
         $columns = array(
-            array('db' => 'title', 'dt' => 0),
-            array('db' => 'artist', 'dt' => 1),
+            array('db' => 'id', 'dt' => 0),
+            array('db' => 'name', 'dt' => 1),
+            array('db' => 'description', 'dt' => 2),
         );
 
         $config = $this->getServiceLocator()->get('Config');
@@ -172,8 +173,9 @@ class ShelveController extends AbstractActionController {
 
         $return = $this->getDataTable()->simple($this->params()->fromQuery(), $sql_details, $table, $primaryKey, $columns);
         foreach ($return['data'] as &$item){
-            $item[0] = utf8_encode($item[0]);
-            $item[1] = utf8_encode($item[1]);
+            foreach($item as &$i){
+                $i = utf8_encode($i);
+            }
         }
         return new JsonModel($return);
     }

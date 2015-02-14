@@ -7,9 +7,54 @@ $this->headTitle($title);
 <script>
 $(document).ready(function() {
     $('#albumTable').dataTable( {
+        "order": [[2, "asc"]],
         "processing": true,
         "serverSide": true,
-        "ajax": "<?php echo $this->url('album', array('action' => 'indexAjax'));?>"
+        "ajax": "<?php echo $this->url('album', array('action' => 'indexAjax'));?>",
+        "columnDefs": [
+            {
+                "visible": false,
+                "targets": 0
+            },
+            {
+                "render": function(data, type, row){
+                    return "<a target=\"_blank\" href=\"".concat(data).concat("\"><img src=\"").concat(data).concat("\" style=\"max-height:60px; width:auto;\"/></a>");
+                },
+                "searchable": false,
+                "sortable": false,
+                "targets": 1
+            },
+            {
+                "searchable": false,
+                "targets": 4
+            },
+            {
+                "searchable": false,
+                "targets": 5
+            },
+            {
+                "searchable": false,
+                "targets": 7
+            },
+            {
+                "searchable": false,
+                "targets": 8
+            },
+            {
+                "render": function(data, type, row)
+                    {
+                        var anchor = "<a alt=\"<?php echo $this->translate('Edit');?>\" class=\"glyphicon glyphicon-pencil\" href=\"<?php echo $this->url('album', array('action' => 'edit'));?>/";
+                        anchor = anchor.concat(row[0]);
+                        anchor = anchor.concat("\"></a> ");
+                        anchor = anchor.concat("<a alt=\"<?php echo $this->translate('Delete');?>\" class=\"glyphicon glyphicon-remove\" href=\"<?php echo $this->url('album', array('action' => 'delete'));?>/");
+                        anchor = anchor.concat(row[0]);
+                        anchor = anchor.concat("\"></a>");
+                        return anchor;
+                    },
+                "sortable": false,
+                "targets": 9
+            }
+        ]
     } );
 } );
 </script>
@@ -20,32 +65,30 @@ $(document).ready(function() {
 <table id="albumTable" class="table">
     <thead>
         <tr>
+            <th><?php echo $this->translate('Id'); ?></th>
+            <th><?php echo $this->translate('Cover'); ?></th>
             <th><?php echo $this->translate('Title'); ?></th>
             <th><?php echo $this->translate('Artist'); ?></th>
             <th><?php echo $this->translate('Platform'); ?></th>
             <th><?php echo $this->translate('Shelve'); ?></th>
-            <th><?php echo $this->translate('Cover'); ?></th>
             <th><?php echo $this->translate('Seen'); ?></th>
             <th><?php echo $this->translate('Register Date'); ?></th>
             <th><?php echo $this->translate('Edit Date'); ?></th>
-            <!-- 
             <th>&nbsp;</th>
-            -->
         </tr>
     </thead>
     <tfoot>
         <tr>
+            <th><?php echo $this->translate('Id'); ?></th>
+            <th><?php echo $this->translate('Cover'); ?></th>
             <th><?php echo $this->translate('Title'); ?></th>
             <th><?php echo $this->translate('Artist'); ?></th>
             <th><?php echo $this->translate('Platform'); ?></th>
             <th><?php echo $this->translate('Shelve'); ?></th>
-            <th><?php echo $this->translate('Cover'); ?></th>
             <th><?php echo $this->translate('Seen'); ?></th>
             <th><?php echo $this->translate('Register Date'); ?></th>
             <th><?php echo $this->translate('Edit Date'); ?></th>
-            <!-- 
             <th>&nbsp;</th>
-            -->
         </tr>
     </tfoot>
 </table>

@@ -4,27 +4,56 @@
 $title = 'My Shelves';
 $this->headTitle($title);
 ?>
+<script>
+$(document).ready(function() {
+    $('#shelveTable').dataTable( {
+        "order": [[1, "asc"]],
+        "processing": true,
+        "serverSide": true,
+        "ajax": "<?php echo $this->url('shelve', array('action' => 'indexAjax'));?>",
+        "columnDefs": [
+            {
+                "visible": false,
+                "targets": 0
+            },
+            {
+                "render": function(data, type, row)
+                    {
+                        var anchor = "<a alt=\"<?php echo $this->translate('Edit');?>\" class=\"glyphicon glyphicon-pencil\" href=\"<?php echo $this->url('shelve', array('action' => 'edit'));?>/";
+                        anchor = anchor.concat(row[0]);
+                        anchor = anchor.concat("\"></a> ");
+                        anchor = anchor.concat("<a alt=\"<?php echo $this->translate('Delete');?>\" class=\"glyphicon glyphicon-remove\" href=\"<?php echo $this->url('shelve', array('action' => 'delete'));?>/");
+                        anchor = anchor.concat(row[0]);
+                        anchor = anchor.concat("\"></a>");
+                        return anchor;
+                    },
+                "sortable": false,
+                "targets": 3
+            }
+            
+        ]
+    } );
+} );
+</script>
 <h1><?php echo $this->escapeHtml($title); ?></h1>
 <p>
     <a href="<?php echo $this->url('shelve', array('action' => 'add')); ?>"><?php echo $this->translate('Add new shelve'); ?></a>
 </p>
-
-<table class="table">
-    <tr>
-        <th><?php echo $this->translate('Name'); ?></th>
-        <th><?php echo $this->translate('Description'); ?></th>
-        <th>&nbsp;</th>
-    </tr>
-    <?php foreach ($shelves as $shelve) : ?>
+<table id="shelveTable" class="table">
+    <thead>
         <tr>
-            <td><?php echo $this->escapeHtml($shelve->name); ?></td>
-            <td><?php echo $this->escapeHtml($shelve->description); ?></td>
-            <td>
-                <a href="<?php echo $this->url('shelve', array('action' => 'edit', 'id' => $shelve->id));
-        ?>">Edit</a>
-                <a href="<?php echo $this->url('shelve', array('action' => 'delete', 'id' => $shelve->id));
-        ?>">Delete</a>
-            </td>
+            <th><?php echo $this->translate('Id'); ?></th>
+            <th><?php echo $this->translate('Name'); ?></th>
+            <th><?php echo $this->translate('Description'); ?></th>
+            <th>&nbsp;</th>
         </tr>
-    <?php endforeach; ?>
+    </thead>
+    <tfoot>
+        <tr>
+            <th><?php echo $this->translate('Id'); ?></th>
+            <th><?php echo $this->translate('Name'); ?></th>
+            <th><?php echo $this->translate('Description'); ?></th>
+            <th>&nbsp;</th>
+        </tr>
+    </tfoot>
 </table>
