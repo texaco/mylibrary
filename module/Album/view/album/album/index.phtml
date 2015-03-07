@@ -25,7 +25,7 @@ $(document).ready(function() {
                 "targets": 1
             },
             {
-                "searchable": false,
+                "searchable": true,
                 "targets": 4
             },
             {
@@ -53,15 +53,50 @@ $(document).ready(function() {
                     },
                 "sortable": false,
                 "targets": 9
-            }
-        ]
+            },
+        ],
     } );
-} );
+});
+
+function searchColumn(column, text){
+    console.log("Serching " + text);
+    $('#albumTable').dataTable().api().columns(column).search(text).draw();
+}
+
 </script>
+
 <h1><?php echo $this->escapeHtml($title); ?></h1>
 <p>
     <a href="<?php echo $this->url('album', array('action' => 'add')); ?>"><?php echo $this->translate('Add new album'); ?></a>
 </p>
+
+
+<!-- Filtering options -->
+<div class="btn-group btn-group-justified" role="group">
+    <!-- Platform filter -->
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <?php echo $this->translate('Select Platform'); ?><span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li><a href="#" onclick="searchColumn(4, '')">All</a></li>
+            <?php foreach ($this->platforms as $platform) { ?>
+                <li><a href="#" onclick="searchColumn(4, '<?php echo $platform; ?>')"><?php echo $this->translate($platform); ?></a></li>
+            <?php } ?>
+        </ul>
+    </div>
+    <!-- Watched filter -->
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <?php echo $this->translate('Watched'); ?><span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li><a href="#" onclick="searchColumn(6, '')">Any</a></li>
+            <li><a href="#" onclick="searchColumn(6, 'none')">Non seen</a></li>
+        </ul>
+    </div>
+</div>
+
 <table id="albumTable" class="table">
     <thead>
         <tr>

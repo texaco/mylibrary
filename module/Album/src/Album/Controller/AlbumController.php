@@ -193,8 +193,8 @@ class AlbumController extends AbstractActionController {
     }
 
     public function indexAction() {
-        
-        return new ViewModel();
+        $this->getPlatformOptions();
+        return array('platforms' => $this->getPlatformOptions());
     }
     
     public function indexAjaxAction(){
