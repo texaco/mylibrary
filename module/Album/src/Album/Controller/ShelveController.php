@@ -13,6 +13,33 @@ class ShelveController extends AbstractActionController {
     protected $shelveTable;
     protected $dataTableService;
 
+    protected $authService;
+    protected $aclService;
+
+    private function getAuthService() {
+        if (!$this->authService) {
+            $sm = $this->getServiceLocator();
+            $this->authService = $sm->get('Album\Service\AuthServiceInterface');
+        }
+        return $this->authService;
+    }
+
+    private function getAclService() {
+        if (!$this->aclService) {
+            $sm = $this->getServiceLocator();
+            $this->aclService = $sm->get('Album\Service\AlbumAclServiceInterface');
+        }
+        return $this->aclService;
+    }
+
+    public function getDataTable() {
+        if (!$this->dataTableService) {
+            $sm = $this->getServiceLocator();
+            $this->dataTableService = $sm->get('Album\Service\DataTableInterface');
+        }
+        return $this->dataTableService;
+    }
+
     public function getShelveTable() {
         if (!$this->shelveTable) {
             $sm = $this->getServiceLocator();
@@ -22,103 +49,118 @@ class ShelveController extends AbstractActionController {
     }
 
     public function addAction() {
-        $form = new ShelveForm();
-        $form->get('submit')->setValue('Add');
-        $form->get('submitAndContinue')->setValue('Add and Continue');
+        if ($this->hasPrivilege()) {
 
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $shelve = new Shelve();
-            $form->setInputFilter($shelve->getInputFilter());
-            $form->setData($request->getPost());
+            $form = new ShelveForm();
+            $form->get('submit')->setValue('Add');
+            $form->get('submitAndContinue')->setValue('Add and Continue');
 
-            if ($form->isValid()) {
-                $shelve->exchangeArray($form->getData());
-                $this->getShelveTable()->saveShelve($shelve);
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $shelve = new Shelve();
+                $form->setInputFilter($shelve->getInputFilter());
+                $form->setData($request->getPost());
 
-                // Redirect to list of albums
-                if ($request->getPost('submit') != null) {
-                    return $this->redirect()->toRoute('shelve');
+                if ($form->isValid()) {
+                    $shelve->exchangeArray($form->getData());
+                    $this->getShelveTable()->saveShelve($shelve);
+
+                    // Redirect to list of albums
+                    if ($request->getPost('submit') != null) {
+                        return $this->redirect()->toRoute('shelve');
+                    }
                 }
             }
-        }
-        $form = new ShelveForm();
-        $form->get('submit')->setValue('Add');
-        $form->get('submitAndContinue')->setValue('Add and Continue');
+            $form = new ShelveForm();
+            $form->get('submit')->setValue('Add');
+            $form->get('submitAndContinue')->setValue('Add and Continue');
 
-        return array('form' => $form);
+            return array('form' => $form);
+        }
+        return $this->redirect()->toRoute('home');
     }
 
     public function editAction() {
-        $id = (int) $this->params()->fromRoute('id', 0);
-        if (!$id) {
-            return $this->redirect()->toRoute('shelve', array(
-                        'action' => 'add'
-            ));
+        if ($this->hasPrivilege()) {
+
+            $id = (int) $this->params()->fromRoute('id', 0);
+            if (!$id) {
+                return $this->redirect()->toRoute('shelve', array(
+                            'action' => 'add'
+                ));
+            }
+
+            // Get the Album with the specified id.  An exception is thrown
+            // if it cannot be found, in which case go to the index page.
+            try {
+                $shelve = $this->getShelveTable()->getShelve($id);
+            } catch (\Exception $ex) {
+                return $this->redirect()->toRoute('shelve', array(
+                            'action' => 'index'
+                ));
+            }
+
+            $form = new ShelveForm();
+            $form->bind($shelve);
+            $form->get('submit')->setAttribute('value', 'Edit');
+
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $form->setInputFilter($shelve->getInputFilter());
+                $form->setData($request->getPost());
+
+                if ($form->isValid()) {
+                    $this->getShelveTable()->saveShelve($shelve);
+
+                    // Redirect to list of albums
+                    return $this->redirect()->toRoute('shelve');
+                }
+            }
+
+            return array(
+                'id' => $id,
+                'form' => $form,
+            );
         }
+        return $this->redirect()->toRoute('home');
+    }
 
-        // Get the Album with the specified id.  An exception is thrown
-        // if it cannot be found, in which case go to the index page.
-        try {
-            $shelve = $this->getShelveTable()->getShelve($id);
-        } catch (\Exception $ex) {
-            return $this->redirect()->toRoute('shelve', array(
-                        'action' => 'index'
-            ));
-        }
+    public function deleteAction() {
+        if ($this->hasPrivilege()) {
 
-        $form = new ShelveForm();
-        $form->bind($shelve);
-        $form->get('submit')->setAttribute('value', 'Edit');
+            $id = (int) $this->params()->fromRoute('id', 0);
+            if (!$id) {
+                return $this->redirect()->toRoute('selve');
+            }
 
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $form->setInputFilter($shelve->getInputFilter());
-            $form->setData($request->getPost());
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $del = $request->getPost('del', 'No');
 
-            if ($form->isValid()) {
-                $this->getShelveTable()->saveShelve($shelve);
+                if ($del == 'Yes') {
+                    $id = (int) $request->getPost('id');
+                    $this->getShelveTable()->deleteShelve($id);
+                }
 
                 // Redirect to list of albums
                 return $this->redirect()->toRoute('shelve');
             }
+
+            return array(
+                'id' => $id,
+                'shelve' => $this->getShelveTable()->getShelve($id)
+            );
         }
-
-        return array(
-            'id' => $id,
-            'form' => $form,
-        );
-    }
-
-    public function deleteAction() {
-        $id = (int) $this->params()->fromRoute('id', 0);
-        if (!$id) {
-            return $this->redirect()->toRoute('selve');
-        }
-
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $del = $request->getPost('del', 'No');
-
-            if ($del == 'Yes') {
-                $id = (int) $request->getPost('id');
-                $this->getShelveTable()->deleteShelve($id);
-            }
-
-            // Redirect to list of albums
-            return $this->redirect()->toRoute('shelve');
-        }
-
-        return array(
-            'id' => $id,
-            'shelve' => $this->getShelveTable()->getShelve($id)
-        );
+        return $this->redirect()->toRoute('home');
     }
 
     public function indexAction() {
-        return new ViewModel(array(
-            'shelves' => $this->getShelveTable()->fetchAll(),
-        ));
+        if ($this->hasPrivilege()) {
+            return new ViewModel(array(
+                'shelves' => $this->getShelveTable()->fetchAll(),
+            ));
+        }
+        return $this->redirect()->toRoute('home');
     }
 
     public function indexAjaxAction() {
@@ -157,7 +199,7 @@ class ShelveController extends AbstractActionController {
         );
 
         $config = $this->getServiceLocator()->get('Config');
-        
+
         $sql_details = array(
             'user' => $config['db']['username'],
             'pass' => $config['db']['password'],
@@ -172,26 +214,28 @@ class ShelveController extends AbstractActionController {
          */
 
         $return = $this->getDataTable()->simple($this->params()->fromQuery(), $sql_details, $table, $primaryKey, $columns);
-        foreach ($return['data'] as &$item){
-            foreach($item as &$i){
+        foreach ($return['data'] as &$item) {
+            foreach ($item as &$i) {
                 $i = utf8_encode($i);
             }
         }
         return new JsonModel($return);
     }
 
-    public function testAction() {
-        return new ViewModel(array(
-            'shelves' => $this->getShelveTable()->fetchAll(),
-        ));
+    private function hasPrivilege($resource = 'Shelve') {
+        if ($this->getAuthService()->hasIdentity()) {
+            \Zend\Debug\Debug::dump($this->getAuthService()->getIdentity());
+            //TODO: Need to get the role.
+            if ($this->getAclService()->isAllowed($this->getAuthService()->getIdentity()->rol, $resource, null)) {
+                \Zend\Debug\Debug::dump('Granted access');
+                return true;
+            } else {
+                \Zend\Debug\Debug::dump('Not enough privilege');
+                return false;
+            }
+        }
+        \Zend\Debug\Debug::dump('No Identity found');
+        return false; // TODO: Set message.
     }
 
-    public function getDataTable()
-    {
-        if (!$this->dataTableService) {
-            $sm = $this->getServiceLocator();
-            $this->dataTableService = $sm->get('Album\Service\DataTableInterface');
-        }
-        return $this->dataTableService;
-    }
 }

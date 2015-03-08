@@ -12,20 +12,16 @@ use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\InputFilterAwareInterface;
 use Zend\InputFilter\InputFilterInterface;
 
-class User {
+class Home {
 
-    public $id;
     public $email;
     public $pass;
-    public $rol;
     
     protected $inputFilter;
 
     public function exchangeArray($data) {
-        $this->id = (!empty($data['id'])) ? $data['id'] : null;
         $this->email = (!empty($data['email'])) ? $data['email'] : null;
         $this->pass = (!empty($data['pass'])) ? $data['pass'] : null;
-        $this->rol = (!empty($data['rol'])) ? $data['rol'] : null;
     }
 
     // Hace serializable el objeto. Necesario para copiar los parametros desde la edición.
@@ -41,14 +37,6 @@ class User {
     public function getInputFilter() {
         if (!$this->inputFilter) {
             $inputFilter = new InputFilter();
-
-            $inputFilter->add(array(
-                'name' => 'id',
-                'required' => true,
-                'filters' => array(
-                    array('name' => 'Int'),
-                ),
-            ));
 
             $inputFilter->add(array(
                 'name' => 'email',
@@ -83,25 +71,6 @@ class User {
                             'encoding' => 'UTF-8',
                             'min' => 8,
                             'max' => 254,
-                        ),
-                    ),
-                ),
-            ));
-
-            $inputFilter->add(array(
-                'name' => 'rol',
-                'required' => true,
-                'filters' => array(
-                    array('name' => 'StripTags'),
-                    array('name' => 'StringTrim'),
-                ),
-                'validators' => array(
-                    array(
-                        'name' => 'StringLength',
-                        'options' => array(
-                            'encoding' => 'UTF-8',
-                            'min' => 1,
-                            'max' => 45,
                         ),
                     ),
                 ),

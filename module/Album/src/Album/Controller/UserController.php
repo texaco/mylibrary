@@ -11,9 +11,26 @@ use Zend\View\Model\JsonModel;
 class UserController extends AbstractActionController {
 
     protected $userTable;
+    protected $authService;
+    protected $aclService;
 
-    public function getDataTable()
-    {
+    private function getAuthService() {
+        if (!$this->authService) {
+            $sm = $this->getServiceLocator();
+            $this->authService = $sm->get('Album\Service\AuthServiceInterface');
+        }
+        return $this->authService;
+    }
+
+    private function getAclService() {
+        if (!$this->aclService) {
+            $sm = $this->getServiceLocator();
+            $this->aclService = $sm->get('Album\Service\AlbumAclServiceInterface');
+        }
+        return $this->aclService;
+    }
+
+    public function getDataTable() {
         if (!$this->dataTableService) {
             $sm = $this->getServiceLocator();
             $this->dataTableService = $sm->get('Album\Service\DataTableInterface');
@@ -30,101 +47,133 @@ class UserController extends AbstractActionController {
     }
 
     public function addAction() {
-        $form = new UserForm();
-        $form->get('submit')->setValue('Add');
+        if ($this->hasPrivilege()) {
+
+            $form = new UserForm();
+            $form->get('submit')->setValue('Add');
 
 
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $user = new User();
-            $form->setInputFilter($user->getInputFilter());
-            $form->setData($request->getPost());
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $user = new User();
+                $form->setInputFilter($user->getInputFilter());
+                $form->setData($request->getPost());
 
-            if ($form->isValid()) {
-                $user->exchangeArray($form->getData());
-                $this->getUserTable()->saveUser($user);
+                if ($form->isValid()) {
+                    $user->exchangeArray($form->getData());
+                    $this->getUserTable()->saveUser($user);
 
-                if ($request->getPost('submit') != null) {
-                    return $this->redirect()->toRoute('user');
+                    if ($request->getPost('submit') != null) {
+                        return $this->redirect()->toRoute('user');
+                    }
                 }
             }
-        }
 
-        return array('form' => $form);
+            return array('form' => $form);
+        }
+        return $this->redirect()->toRoute('home');
     }
 
     public function editAction() {
-        $id = (int) $this->params()->fromRoute('id', 0);
-        if (!$id) {
-            return $this->redirect()->toRoute('user', array(
-                        'action' => 'add'
-            ));
+        if ($this->hasPrivilege()) {
+
+            $id = (int) $this->params()->fromRoute('id', 0);
+            if (!$id) {
+                return $this->redirect()->toRoute('user', array(
+                            'action' => 'add'
+                ));
+            }
+
+            // Get the Album with the specified id.  An exception is thrown
+            // if it cannot be found, in which case go to the index page.
+            try {
+                $user = $this->getUserTable()->getUser($id);
+            } catch (\Exception $ex) {
+                return $this->redirect()->toRoute('user', array(
+                            'action' => 'index'
+                ));
+            }
+
+            $form = new UserForm();
+            $form->bind($user);
+            $form->get('submit')->setAttribute('value', 'Edit');
+
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $form->setInputFilter($user->getInputFilter());
+                $form->setData($request->getPost());
+
+                if ($form->isValid()) {
+                    $this->getUserTable()->saveUser($user);
+
+                    // Redirect to list of albums
+                    return $this->redirect()->toRoute('user');
+                }
+            }
+
+            return array(
+                'id' => $id,
+                'form' => $form,
+            );
         }
+        return $this->redirect()->toRoute('home');
+    }
 
-        // Get the Album with the specified id.  An exception is thrown
-        // if it cannot be found, in which case go to the index page.
-        try {
-            $user = $this->getUserTable()->getUser($id);
-        } catch (\Exception $ex) {
-            return $this->redirect()->toRoute('user', array(
-                        'action' => 'index'
-            ));
-        }
+    public function deleteAction() {
+        if ($this->hasPrivilege()) {
 
-        $form = new UserForm();
-        $form->bind($user);
-        $form->get('submit')->setAttribute('value', 'Edit');
+            $id = (int) $this->params()->fromRoute('id', 0);
+            if (!$id) {
+                return $this->redirect()->toRoute('user');
+            }
 
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $form->setInputFilter($user->getInputFilter());
-            $form->setData($request->getPost());
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $del = $request->getPost('del', 'No');
 
-            if ($form->isValid()) {
-                $this->getUserTable()->saveUser($user);
+                if ($del == 'Yes') {
+                    $id = (int) $request->getPost('id');
+                    $this->getUserTable()->deleteUser($id);
+                }
 
                 // Redirect to list of albums
                 return $this->redirect()->toRoute('user');
             }
+
+            return array(
+                'id' => $id,
+                'user' => $this->getUserTable()->getUser($id)
+            );
         }
-
-        return array(
-            'id' => $id,
-            'form' => $form,
-        );
-    }
-
-    public function deleteAction() {
-        $id = (int) $this->params()->fromRoute('id', 0);
-        if (!$id) {
-            return $this->redirect()->toRoute('user');
-        }
-
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $del = $request->getPost('del', 'No');
-
-            if ($del == 'Yes') {
-                $id = (int) $request->getPost('id');
-                $this->getUserTable()->deleteUser($id);
-            }
-
-            // Redirect to list of albums
-            return $this->redirect()->toRoute('user');
-        }
-
-        return array(
-            'id' => $id,
-            'user' => $this->getUserTable()->getUser($id)
-        );
+        return $this->redirect()->toRoute('home');
     }
 
     public function indexAction() {
-        return new ViewModel();
+        if ($this->hasPrivilege()) {
+            return new ViewModel();
+        }
+        // TODO: Redirect to information page.
+        return $this->redirect()->toRoute('home');
     }
-    
-    public function indexAjaxAction(){
-                /*
+
+    private function hasPrivilege($resource = 'User') {
+        if ($this->getAuthService()->hasIdentity()) {
+            \Zend\Debug\Debug::dump($this->getAuthService()->getIdentity());
+            //TODO: Need to get the role.
+            if ($this->getAclService()->isAllowed($this->getAuthService()->getIdentity()->rol, $resource, null)) {
+                \Zend\Debug\Debug::dump('Granted access');
+                return true;
+            } else {
+                \Zend\Debug\Debug::dump('Not enough privilege');
+                return false;
+            }
+        }
+        \Zend\Debug\Debug::dump('No Identity found');
+        return false; // TODO: Set message.
+    }
+
+    public function indexAjaxAction() {
+        /*
          * DataTables example server-side processing script.
          *
          * Please note that this script is intentionally extremely simply to show how
@@ -159,7 +208,7 @@ class UserController extends AbstractActionController {
         );
 
         $config = $this->getServiceLocator()->get('Config');
-        
+
         $sql_details = array(
             'user' => $config['db']['username'],
             'pass' => $config['db']['password'],
@@ -174,11 +223,11 @@ class UserController extends AbstractActionController {
          */
 
         $return = $this->getDataTable()->simple($this->params()->fromQuery(), $sql_details, $table, $primaryKey, $columns);
-        foreach ($return['data'] as &$item){
+        foreach ($return['data'] as &$item) {
             foreach ($item as &$i)
-            $i = utf8_encode($i);
+                $i = utf8_encode($i);
         }
         return new JsonModel($return);
-
     }
+
 }

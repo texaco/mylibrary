@@ -4,6 +4,7 @@ return array(
     'service_manager' => array(
         'invokables' => array(
             'Album\Service\DataTableInterface' => 'Album\Service\DataTable',
+            'Album\Service\AlbumAclServiceInterface' => 'Album\Service\AlbumAclService',
             'Album\Service\AuthServiceInterface' => 'Zend\Authentication\AuthenticationService',
         )
     ),

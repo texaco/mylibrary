@@ -58,9 +58,11 @@ class UserTable {
     }
 
     public function saveUser(User $user) {
+        
         $data = array(
             'email' => $user->email,
-            'pass' => $user->pass,
+            'pass' => md5($user->pass),
+            'rol' => $user->rol,
         );
 
         $id = (int) $user->id;

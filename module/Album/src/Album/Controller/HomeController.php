@@ -3,24 +3,15 @@
 namespace Album\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
-use Album\Model\User;
 use \Zend\View\Model\ViewModel;
 use Album\Form\HomeForm;
+use Album\Model\Home;
 use Zend\Debug\Debug;
 
 class HomeController extends AbstractActionController {
 
-    protected $userTable;
     protected $authDbAdapter;
     protected $authService;
-
-    public function getUserTable() {
-        if (!$this->userTable) {
-            $sm = $this->getServiceLocator();
-            $this->userTable = $sm->get('Album\Model\UserTable');
-        }
-        return $this->userTable;
-    }
 
     public function getAuthDbAdapter() {
         if (!$this->authDbAdapter) {
@@ -41,21 +32,25 @@ class HomeController extends AbstractActionController {
     function loginAction() {
         $this->layout('layout/home');
         $form = new HomeForm();
-        $var = 'test';
-        Debug::dump($var);
+
+        if($this->getAuthService()->hasIdentity()){
+            Debug::dump($this->getAuthService()->getIdentity());
+        }
 
         
         $request = $this->getRequest();
         if ($request->isPost()) {
-            $user = new User();
-            $form->setInputFilter($user->getInputFilter());
+            $home = new Home();
+            $form->setInputFilter($home->getInputFilter());
             $form->setData($request->getPost());
 
             if ($form->isValid()) {
-                $user->exchangeArray($form->getData());
-                $this->getAuthDbAdapter()->setIdentity($user->email)->setCredential($user->pass);
+                $home->exchangeArray($form->getData());
+                $this->getAuthDbAdapter()->setIdentity($home->email)->setCredential($home->pass);
                 $result = $this->getAuthService()->authenticate($this->getAuthDbAdapter());
                 if($result->isValid()){
+                    $storage = $this->getAuthService()->getStorage();
+                    $storage->write($this->getAuthDbAdapter()->getResultRowObject(array('email', 'rol')));
                     return $this->redirect()->toRoute('album');
                 }
                 else{
@@ -64,5 +59,15 @@ class HomeController extends AbstractActionController {
             }
         }
         return array('form' => $form);
+    }
+    
+    function logoutAction(){
+        $this->getAuthService()->clearIdentity();
+        if($this->getAuthService()->hasIdentity()){
+            Debug::dump($this->getAuthService()->getIdentity());
+        } else {
+            Debug::dump('It has not identity');
+        }
+        return array('form' => new HomeForm(), 'error_msg' => 'success_logout');
     }
 }

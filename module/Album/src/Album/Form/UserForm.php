@@ -43,6 +43,21 @@ class UserForm extends Form {
             ),
         ));
         $this->add(array(
+            'name' => 'rol',
+            'type' => 'Select',
+            'options' => array(
+                'label' => 'Rol',
+                'value_options' => array(
+                    'Guest' => 'Guest',
+                    'User' => 'User',
+                    'Admin' => 'Admin',
+                ),
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
+            ),
+        ));
+        $this->add(array(
             'name' => 'submit',
             'type' => 'Submit',
             'attributes' => array(

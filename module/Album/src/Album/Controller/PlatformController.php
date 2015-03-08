@@ -12,6 +12,32 @@ class PlatformController extends AbstractActionController {
 
     protected $platformTable;
     protected $dataTableService;
+    protected $authService;
+    protected $aclService;
+
+    private function getAuthService() {
+        if (!$this->authService) {
+            $sm = $this->getServiceLocator();
+            $this->authService = $sm->get('Album\Service\AuthServiceInterface');
+        }
+        return $this->authService;
+    }
+
+    private function getAclService() {
+        if (!$this->aclService) {
+            $sm = $this->getServiceLocator();
+            $this->aclService = $sm->get('Album\Service\AlbumAclServiceInterface');
+        }
+        return $this->aclService;
+    }
+
+    public function getDataTable() {
+        if (!$this->dataTableService) {
+            $sm = $this->getServiceLocator();
+            $this->dataTableService = $sm->get('Album\Service\DataTableInterface');
+        }
+        return $this->dataTableService;
+    }
 
     public function getPlatformTable() {
         if (!$this->platformTable) {
@@ -22,107 +48,110 @@ class PlatformController extends AbstractActionController {
     }
 
     public function addAction() {
-        $form = new PlatformForm();
-        $form->get('submit')->setValue('Add');
-        $form->get('submitAndContinue')->setValue('Add and Continue');
+        if ($this->hasPrivilege()) {
 
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $platform = new Platform();
-            $form->setInputFilter($platform->getInputFilter());
-            $form->setData($request->getPost());
+            $form = new PlatformForm();
+            $form->get('submit')->setValue('Add');
+            $form->get('submitAndContinue')->setValue('Add and Continue');
 
-            if ($form->isValid()) {
-                $platform->exchangeArray($form->getData());
-                $this->getPlatformTable()->savePlatform($platform);
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $platform = new Platform();
+                $form->setInputFilter($platform->getInputFilter());
+                $form->setData($request->getPost());
 
-                // Redirect to list of albums
-                if ($request->getPost('submit') != null) {
-                    return $this->redirect()->toRoute('platform');
+                if ($form->isValid()) {
+                    $platform->exchangeArray($form->getData());
+                    $this->getPlatformTable()->savePlatform($platform);
+
+                    // Redirect to list of albums
+                    if ($request->getPost('submit') != null) {
+                        return $this->redirect()->toRoute('platform');
+                    }
                 }
             }
-        }
 
-        $form = new PlatformForm();
-        $form->get('submit')->setValue('Add');
-        $form->get('submitAndContinue')->setValue('Add and Continue');
-        
-        return array('form' => $form);
+            $form = new PlatformForm();
+            $form->get('submit')->setValue('Add');
+            $form->get('submitAndContinue')->setValue('Add and Continue');
+
+            return array('form' => $form);
+        }
+        return $this->redirect()->toRoute('home');
     }
 
     public function editAction() {
-        $id = (int) $this->params()->fromRoute('id', 0);
-        if (!$id) {
-            return $this->redirect()->toRoute('platform', array(
-                        'action' => 'add'
-            ));
+
+        if ($this->hasPrivilege()) {
+
+            $id = (int) $this->params()->fromRoute('id', 0);
+            if (!$id) {
+                return $this->redirect()->toRoute('platform', array(
+                            'action' => 'add'
+                ));
+            }
+
+            // Get the Album with the specified id.  An exception is thrown
+            // if it cannot be found, in which case go to the index page.
+            try {
+                $platform = $this->getPlatformTable()->getPlatform($id);
+            } catch (\Exception $ex) {
+                return $this->redirect()->toRoute('platform', array(
+                            'action' => 'index'
+                ));
+            }
+
+            $form = new PlatformForm();
+            $form->bind($platform);
+            $form->get('submit')->setAttribute('value', 'Edit');
+
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $form->setInputFilter($platform->getInputFilter());
+                $form->setData($request->getPost());
+
+                if ($form->isValid()) {
+                    $this->getPlatformTable()->savePlatform($platform);
+
+                    // Redirect to list of albums
+                    return $this->redirect()->toRoute('platform');
+                }
+            }
+
+            return array(
+                'id' => $id,
+                'form' => $form,
+            );
         }
+        return $this->redirect()->toRoute('home');
+    }
 
-        // Get the Album with the specified id.  An exception is thrown
-        // if it cannot be found, in which case go to the index page.
-        try {
-            $platform = $this->getPlatformTable()->getPlatform($id);
-        } catch (\Exception $ex) {
-            return $this->redirect()->toRoute('platform', array(
-                        'action' => 'index'
-            ));
-        }
+    public function deleteAction() {
+        if ($this->hasPrivilege()) {
+            $id = (int) $this->params()->fromRoute('id', 0);
+            if (!$id) {
+                return $this->redirect()->toRoute('platform');
+            }
 
-        $form = new PlatformForm();
-        $form->bind($platform);
-        $form->get('submit')->setAttribute('value', 'Edit');
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+                $del = $request->getPost('del', 'No');
 
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $form->setInputFilter($platform->getInputFilter());
-            $form->setData($request->getPost());
-
-            if ($form->isValid()) {
-                $this->getPlatformTable()->savePlatform($platform);
+                if ($del == 'Yes') {
+                    $id = (int) $request->getPost('id');
+                    $this->getPlatformTable()->deletePlatform($id);
+                }
 
                 // Redirect to list of albums
                 return $this->redirect()->toRoute('platform');
             }
+
+            return array(
+                'id' => $id,
+                'platform' => $this->getPlatformTable()->getPlatform($id)
+            );
         }
-
-        return array(
-            'id' => $id,
-            'form' => $form,
-        );
-    }
-
-    public function deleteAction() {
-        $id = (int) $this->params()->fromRoute('id', 0);
-        if (!$id) {
-            return $this->redirect()->toRoute('platform');
-        }
-
-        $request = $this->getRequest();
-        if ($request->isPost()) {
-            $del = $request->getPost('del', 'No');
-
-            if ($del == 'Yes') {
-                $id = (int) $request->getPost('id');
-                $this->getPlatformTable()->deletePlatform($id);
-            }
-
-            // Redirect to list of albums
-            return $this->redirect()->toRoute('platform');
-        }
-
-        return array(
-            'id' => $id,
-            'platform' => $this->getPlatformTable()->getPlatform($id)
-        );
-    }
-
-    public function getDataTable()
-    {
-        if (!$this->dataTableService) {
-            $sm = $this->getServiceLocator();
-            $this->dataTableService = $sm->get('Album\Service\DataTableInterface');
-        }
-        return $this->dataTableService;
+        return $this->redirect()->toRoute('home');
     }
 
     public function indexAjaxAction() {
@@ -161,7 +190,7 @@ class PlatformController extends AbstractActionController {
         );
 
         $config = $this->getServiceLocator()->get('Config');
-        
+
         $sql_details = array(
             'user' => $config['db']['username'],
             'pass' => $config['db']['password'],
@@ -176,8 +205,8 @@ class PlatformController extends AbstractActionController {
          */
 
         $return = $this->getDataTable()->simple($this->params()->fromQuery(), $sql_details, $table, $primaryKey, $columns);
-        foreach ($return['data'] as &$item){
-            foreach($item as &$i){
+        foreach ($return['data'] as &$item) {
+            foreach ($item as &$i) {
                 $i = utf8_encode($i);
             }
         }
@@ -188,6 +217,22 @@ class PlatformController extends AbstractActionController {
         return new ViewModel(array(
             'platforms' => $this->getPlatformTable()->fetchAll(),
         ));
+    }
+
+    private function hasPrivilege($resource = 'Platform') {
+        if ($this->getAuthService()->hasIdentity()) {
+            \Zend\Debug\Debug::dump($this->getAuthService()->getIdentity());
+            //TODO: Need to get the role.
+            if ($this->getAclService()->isAllowed($this->getAuthService()->getIdentity()->rol, $resource, null)) {
+                \Zend\Debug\Debug::dump('Granted access');
+                return true;
+            } else {
+                \Zend\Debug\Debug::dump('Not enough privilege');
+                return false;
+            }
+        }
+        \Zend\Debug\Debug::dump('No Identity found');
+        return false; // TODO: Set message.
     }
 
 }
