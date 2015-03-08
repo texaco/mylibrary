@@ -14,13 +14,14 @@ use Zend\InputFilter\InputFilterInterface;
 
 class User {
 
-    public $idUser;
+    public $id;
     public $email;         // ARTIST/AUTHOR OR DEVELOPER
     public $pass;          // TITLE
+    
     protected $inputFilter;
 
     public function exchangeArray($data) {
-        $this->idUser = (!empty($data['idUser'])) ? $data['idUser'] : null;
+        $this->id = (!empty($data['id'])) ? $data['id'] : null;
         $this->email = (!empty($data['email'])) ? $data['email'] : null;
         $this->pass = (!empty($data['pass'])) ? $data['pass'] : null;
     }
@@ -40,7 +41,7 @@ class User {
             $inputFilter = new InputFilter();
 
             $inputFilter->add(array(
-                'name' => 'idUser',
+                'name' => 'id',
                 'required' => true,
                 'filters' => array(
                     array('name' => 'Int'),
@@ -59,7 +60,7 @@ class User {
                         'name' => 'StringLength',
                         'options' => array(
                             'encoding' => 'UTF-8',
-                            'min' => 1,
+                            'min' => 3,
                             'max' => 254,
                         ),
                     ),
@@ -78,7 +79,7 @@ class User {
                         'name' => 'StringLength',
                         'options' => array(
                             'encoding' => 'UTF-8',
-                            'min' => 1,
+                            'min' => 8,
                             'max' => 254,
                         ),
                     ),

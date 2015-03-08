@@ -1,0 +1,65 @@
+<?php
+// module/Album/view/album/user/index.phtml:
+
+$title = 'Users';
+$this->headTitle($title);
+?>
+<script>
+$(document).ready(function() {
+    $('#userTable').dataTable( {
+        "order": [[1, "asc"]],
+        "processing": true,
+        "serverSide": true,
+        "ajax": "<?php echo $this->url('user', array('action' => 'indexAjax'));?>",
+        "columnDefs": [
+            {
+                "visible": false,
+                "targets": 0
+            },
+            {
+                "searchable": false,
+                "sortable": false,
+                "targets": 2
+            },
+            {
+                "render": function(data, type, row)
+                    {
+                        var anchor = "<a alt=\"<?php echo $this->translate('Edit');?>\" class=\"glyphicon glyphicon-pencil\" href=\"<?php echo $this->url('user', array('action' => 'edit'));?>/";
+                        anchor = anchor.concat(row[0]);
+                        anchor = anchor.concat("\"></a> ");
+                        anchor = anchor.concat("<a alt=\"<?php echo $this->translate('Delete');?>\" class=\"glyphicon glyphicon-remove\" href=\"<?php echo $this->url('user', array('action' => 'delete'));?>/");
+                        anchor = anchor.concat(row[0]);
+                        anchor = anchor.concat("\"></a>");
+                        return anchor;
+                    },
+                "sortable": false,
+                "targets": 3
+            },
+        ],
+    } );
+});
+</script>
+
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<p>
+    <a href="<?php echo $this->url('user', array('action' => 'add')); ?>"><?php echo $this->translate('Add new user'); ?></a>
+</p>
+
+<table id="userTable" class="table">
+    <thead>
+        <tr>
+            <th><?php echo $this->translate('Id'); ?></th>
+            <th><?php echo $this->translate('Email'); ?></th>
+            <th><?php echo $this->translate('Password'); ?></th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th><?php echo $this->translate('Id'); ?></th>
+            <th><?php echo $this->translate('Email'); ?></th>
+            <th><?php echo $this->translate('Password'); ?></th>
+            <th>&nbsp;</th>
+        </tr>
+    </tfoot>
+</table>

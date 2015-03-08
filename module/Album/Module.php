@@ -14,6 +14,7 @@ use Album\Model\Platform;
 use Album\Model\PlatformTable;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Authentication\Adapter\DbTable\CredentialTreatmentAdapter as AuthDbAdapter;
 
 class Module implements AutoloaderProviderInterface, ConfigProviderInterface {
 
@@ -81,11 +82,16 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface {
                     $resultSetPrototype->setArrayObjectPrototype(new Platform());
                     return new TableGateway('platform', $dbAdapter, null, $resultSetPrototype);
                 },
+                'AuthDbAdapter' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    return new AuthDbAdapter($dbAdapter, 'user', 'email', 'pass', 'MD5(?)');
+                },
             ),
             'invokables' => array(
                 // Keys are the service names
                 // Values are valid class names to instantiate.
-                'Album\Service\DataTable' => 'Album\Service\DataTable',
+                //'Album\Service\DataTable' => 'Album\Service\DataTable',
+                //'Album\Service\AuthService' => 'Zend\Authentication\AuthenticationService'
             ),  
         );
     }

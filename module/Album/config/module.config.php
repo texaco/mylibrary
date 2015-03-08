@@ -3,7 +3,8 @@
 return array(
     'service_manager' => array(
         'invokables' => array(
-            'Album\Service\DataTableInterface' => 'Album\Service\DataTable'
+            'Album\Service\DataTableInterface' => 'Album\Service\DataTable',
+            'Album\Service\AuthServiceInterface' => 'Zend\Authentication\AuthenticationService',
         )
     ),
     'controllers' => array(
@@ -11,6 +12,7 @@ return array(
             'Album\Controller\Album' => 'Album\Controller\AlbumController',
             'Album\Controller\Shelve' => 'Album\Controller\ShelveController',
             'Album\Controller\Platform' => 'Album\Controller\PlatformController',
+            'Album\Controller\User' => 'Album\Controller\UserController',
             'Album\Controller\Home' => 'Album\Controller\HomeController',
         ),
     ),
@@ -54,6 +56,20 @@ return array(
                     ),
                     'defaults' => array(
                         'controller' => 'Album\Controller\Platform',
+                        'action' => 'index',
+                    ),
+                ),
+            ),
+            'user' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/user[/:action][/:id]',
+                    'constraints' => array(
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[0-9]+',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Album\Controller\User',
                         'action' => 'index',
                     ),
                 ),

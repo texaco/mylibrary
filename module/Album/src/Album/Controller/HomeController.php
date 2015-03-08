@@ -6,10 +6,13 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Album\Model\User;
 use \Zend\View\Model\ViewModel;
 use Album\Form\HomeForm;
+use Zend\Debug\Debug;
 
 class HomeController extends AbstractActionController {
 
     protected $userTable;
+    protected $authDbAdapter;
+    protected $authService;
 
     public function getUserTable() {
         if (!$this->userTable) {
@@ -19,9 +22,29 @@ class HomeController extends AbstractActionController {
         return $this->userTable;
     }
 
-    function loginAction() {
-        $form = new HomeForm();
+    public function getAuthDbAdapter() {
+        if (!$this->authDbAdapter) {
+            $sm = $this->getServiceLocator();
+            $this->authDbAdapter= $sm->get('AuthDbAdapter');
+        }
+        return $this->authDbAdapter;
+    }
 
+    public function getAuthService() {
+        if (!$this->authService) {
+            $sm = $this->getServiceLocator();
+            $this->authService= $sm->get('Album\Service\AuthServiceInterface');
+        }
+        return $this->authService;
+    }
+
+    function loginAction() {
+        $this->layout('layout/home');
+        $form = new HomeForm();
+        $var = 'test';
+        Debug::dump($var);
+
+        
         $request = $this->getRequest();
         if ($request->isPost()) {
             $user = new User();
@@ -30,12 +53,12 @@ class HomeController extends AbstractActionController {
 
             if ($form->isValid()) {
                 $user->exchangeArray($form->getData());
-                if($this->getUserTable()->checkUser($user->email, $user->pass)){
-                    // TODO: Manage User Session.
+                $this->getAuthDbAdapter()->setIdentity($user->email)->setCredential($user->pass);
+                $result = $this->getAuthService()->authenticate($this->getAuthDbAdapter());
+                if($result->isValid()){
                     return $this->redirect()->toRoute('album');
                 }
                 else{
-                    // TODO: Send error message.
                     return array('form' => $form, 'error_msg' => 'error_login');
                 }
             }
