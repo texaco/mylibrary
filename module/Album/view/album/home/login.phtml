@@ -1,0 +1,23 @@
+<?php
+// module/Album/view/album/home/index.phtml:
+
+$title = 'Home';
+$this->headTitle($this->translate($title));
+?>
+
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+
+<?php if($this->error_msg) { ?>
+<div class="alert alert-danger" role="alert"><?php echo $this->translate($this->error_msg); ?></div>
+  
+<?php
+}
+
+$form->setAttribute('action', $this->url('home'));
+$form->prepare();
+
+echo $this->form()->openTag($form);
+
+echo $this->formCollection($form);
+
+echo $this->form()->closeTag();

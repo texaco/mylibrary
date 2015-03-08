@@ -11,6 +11,7 @@ return array(
             'Album\Controller\Album' => 'Album\Controller\AlbumController',
             'Album\Controller\Shelve' => 'Album\Controller\ShelveController',
             'Album\Controller\Platform' => 'Album\Controller\PlatformController',
+            'Album\Controller\Home' => 'Album\Controller\HomeController',
         ),
     ),
     'router' => array(
@@ -54,6 +55,19 @@ return array(
                     'defaults' => array(
                         'controller' => 'Album\Controller\Platform',
                         'action' => 'index',
+                    ),
+                ),
+            ),
+            'home' => array(
+                'type' => 'segment',
+                'options' => array(
+                    'route' => '/home[/:action]',
+                    'constraints' => array(
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                    ),
+                    'defaults' => array(
+                        'controller' => 'Album\Controller\Home',
+                        'action' => 'login',
                     ),
                 ),
             ),

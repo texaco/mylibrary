@@ -4,6 +4,8 @@ namespace Album;
 
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
+use Album\Model\User;
+use Album\Model\UserTable;
 use Album\Model\Album;
 use Album\Model\AlbumTable;
 use Album\Model\Shelve;
@@ -35,6 +37,17 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface {
     public function getServiceConfig() {
         return array(
             'factories' => array(
+                'Album\Model\UserTable' => function($sm) {
+                    $tableGateway = $sm->get('UserTableGateway');
+                    $table = new UserTable($tableGateway);
+                    return $table;
+                },
+                'UserTableGateway' => function ($sm) {
+                    $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new User());
+                    return new TableGateway('user', $dbAdapter, null, $resultSetPrototype);
+                },
                 'Album\Model\AlbumTable' => function($sm) {
                     $tableGateway = $sm->get('AlbumTableGateway');
                     $table = new AlbumTable($tableGateway);
