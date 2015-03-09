@@ -78,7 +78,7 @@ class PlatformController extends AbstractActionController {
 
             return array('form' => $form);
         }
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     public function editAction() {
@@ -124,7 +124,7 @@ class PlatformController extends AbstractActionController {
                 'form' => $form,
             );
         }
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     public function deleteAction() {
@@ -152,7 +152,7 @@ class PlatformController extends AbstractActionController {
                 'platform' => $this->getPlatformTable()->getPlatform($id)
             );
         }
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     public function indexAjaxAction() {

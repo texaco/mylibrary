@@ -71,7 +71,7 @@ class UserController extends AbstractActionController {
 
             return array('form' => $form);
         }
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     public function editAction() {
@@ -116,7 +116,7 @@ class UserController extends AbstractActionController {
                 'form' => $form,
             );
         }
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     public function deleteAction() {
@@ -145,7 +145,7 @@ class UserController extends AbstractActionController {
                 'user' => $this->getUserTable()->getUser($id)
             );
         }
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     public function indexAction() {
@@ -153,7 +153,7 @@ class UserController extends AbstractActionController {
             return new ViewModel();
         }
         // TODO: Redirect to information page.
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     private function hasPrivilege($resource = 'User') {

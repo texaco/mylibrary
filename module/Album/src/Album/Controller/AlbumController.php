@@ -140,7 +140,7 @@ class AlbumController extends AbstractActionController {
             );
         }
 
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     public function editAction() {
@@ -191,7 +191,7 @@ class AlbumController extends AbstractActionController {
                 'search_array' => $search_array,
             );
         }
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     public function deleteAction() {
@@ -220,7 +220,7 @@ class AlbumController extends AbstractActionController {
                 'album' => $this->getAlbumTable()->getAlbum($id)
             );
         }
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     public function indexAction() {
@@ -229,11 +229,9 @@ class AlbumController extends AbstractActionController {
             return array('platforms' => $this->getPlatformOptions(), 
                 'idUser' => $this->getAuthService()->getIdentity()->id);
         }
-        else{
-            $this->redirect()->toRoute('home');
-            return array('form' => new \Album\Form\HomeForm(), 'error_msg' => 'No identity found');
+        $this->redirect()->toRoute('home', array('action' => 'logout'));
+        return array('form' => new \Album\Form\HomeForm(), 'error_msg' => 'No identity found');
             
-        }
     }
 
     private function hasPrivilege($resource = 'Album') {

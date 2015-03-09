@@ -78,7 +78,7 @@ class ShelveController extends AbstractActionController {
 
             return array('form' => $form);
         }
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     public function editAction() {
@@ -123,7 +123,7 @@ class ShelveController extends AbstractActionController {
                 'form' => $form,
             );
         }
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     public function deleteAction() {
@@ -152,7 +152,7 @@ class ShelveController extends AbstractActionController {
                 'shelve' => $this->getShelveTable()->getShelve($id)
             );
         }
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     public function indexAction() {
@@ -161,7 +161,7 @@ class ShelveController extends AbstractActionController {
                 'shelves' => $this->getShelveTable()->fetchAll(),
             ));
         }
-        return $this->redirect()->toRoute('home');
+        return $this->redirect()->toRoute('home', array('action' => 'logout'));
     }
 
     public function indexAjaxAction() {

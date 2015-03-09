@@ -29,13 +29,13 @@ class HomeController extends AbstractActionController {
     }
 
     function loginAction() {
+        if($this->getAuthService()->hasIdentity()){
+            return $this->redirect()->toRoute('album');
+        }
+
         $this->layout('layout/home');
         $form = new HomeForm();
 
-        if($this->getAuthService()->hasIdentity()){
-        }
-
-        
         $request = $this->getRequest();
         if ($request->isPost()) {
             $home = new Home();
