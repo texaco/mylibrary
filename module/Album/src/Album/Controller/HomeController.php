@@ -6,7 +6,6 @@ use Zend\Mvc\Controller\AbstractActionController;
 use \Zend\View\Model\ViewModel;
 use Album\Form\HomeForm;
 use Album\Model\Home;
-use Zend\Debug\Debug;
 
 class HomeController extends AbstractActionController {
 
@@ -34,7 +33,6 @@ class HomeController extends AbstractActionController {
         $form = new HomeForm();
 
         if($this->getAuthService()->hasIdentity()){
-            Debug::dump($this->getAuthService()->getIdentity());
         }
 
         
@@ -63,11 +61,6 @@ class HomeController extends AbstractActionController {
     
     function logoutAction(){
         $this->getAuthService()->clearIdentity();
-        if($this->getAuthService()->hasIdentity()){
-            Debug::dump($this->getAuthService()->getIdentity());
-        } else {
-            Debug::dump('It has not identity');
-        }
-        return array('form' => new HomeForm(), 'error_msg' => 'success_logout');
+        return $this->redirect()->toRoute('home');
     }
 }

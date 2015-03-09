@@ -221,17 +221,13 @@ class PlatformController extends AbstractActionController {
 
     private function hasPrivilege($resource = 'Platform') {
         if ($this->getAuthService()->hasIdentity()) {
-            \Zend\Debug\Debug::dump($this->getAuthService()->getIdentity());
             //TODO: Need to get the role.
             if ($this->getAclService()->isAllowed($this->getAuthService()->getIdentity()->rol, $resource, null)) {
-                \Zend\Debug\Debug::dump('Granted access');
                 return true;
             } else {
-                \Zend\Debug\Debug::dump('Not enough privilege');
                 return false;
             }
         }
-        \Zend\Debug\Debug::dump('No Identity found');
         return false; // TODO: Set message.
     }
 
