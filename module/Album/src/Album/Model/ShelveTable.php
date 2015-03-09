@@ -18,8 +18,11 @@ class ShelveTable {
         $this->tableGateway = $tableGateway;
     }
 
-    public function fetchAll() {
-        $resultSet = $this->tableGateway->select();
+    public function fetchAll($idUser) {
+        $select = $this->tableGateway->getSql()->select();
+        $conditions = array('idUser' => $idUser);
+        $select->where($conditions);
+        $resultSet = $this->tableGateway->selectWith($select);
         return $resultSet;
     }
 
@@ -37,6 +40,7 @@ class ShelveTable {
         $data = array(
             'name' => $shelve->name,
             'description' => $shelve->description,
+            'idUser' => $shelve->idUser,
         );
 
         $id = (int) $shelve->id;

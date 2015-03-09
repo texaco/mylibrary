@@ -78,7 +78,7 @@ class AlbumController extends AbstractActionController {
     }
 
     private function getShelveOptions() {
-        $shelves = $this->getShelveTable()->fetchAll();
+        $shelves = $this->getShelveTable()->fetchAll($this->getAuthService()->getIdentity()->id);
         $shelveOptions = array();
 
         foreach ($shelves as $shelve) {
@@ -88,7 +88,7 @@ class AlbumController extends AbstractActionController {
     }
 
     private function getPlatformOptions() {
-        $platforms = $this->getPlatformTable()->fetchAll();
+        $platforms = $this->getPlatformTable()->fetchAll($this->getAuthService()->getIdentity()->id);
         $platformOptions = array();
 
         foreach ($platforms as $platform) {
@@ -130,8 +130,9 @@ class AlbumController extends AbstractActionController {
             $form->get('submitAndContinue')->setValue('Add and Continue');
             $form->get('shelve')->setValueOptions($this->getShelveOptions());
             $form->get('platform')->setValueOptions($this->getPlatformOptions());
+            $form->get('idUser')->setValue($this->getAuthService()->getIdentity()->id);
 
-            $albums = $this->getAlbumTable()->fetchAll();
+            $albums = $this->getAlbumTable()->fetchAll($this->getAuthService()->getIdentity()->id);
             $search_array = $this->get_array_unique_search($albums);
 
             return array('form' => $form,
@@ -181,7 +182,7 @@ class AlbumController extends AbstractActionController {
                 }
             }
 
-            $albums = $this->getAlbumTable()->fetchAll();
+            $albums = $this->getAlbumTable()->fetchAll($this->getAuthService()->getIdentity()->id);
             $search_array = $this->get_array_unique_search($albums);
 
             return array(
@@ -224,8 +225,9 @@ class AlbumController extends AbstractActionController {
 
     public function indexAction() {
         if ($this->hasPrivilege()) {
-            $this->getPlatformOptions();
-            return array('platforms' => $this->getPlatformOptions());
+            //$this->getPlatformOptions();
+            return array('platforms' => $this->getPlatformOptions(), 
+                'idUser' => $this->getAuthService()->getIdentity()->id);
         }
         else{
             $this->redirect()->toRoute('home');
@@ -302,7 +304,7 @@ class AlbumController extends AbstractActionController {
          * server-side, there is no need to edit below this line.
          */
 
-        $return = $this->getDataTable()->simple($this->params()->fromQuery(), $sql_details, $table, $primaryKey, $columns);
+        $return = $this->getDataTable()->complex($this->params()->fromQuery(), $sql_details, $table, $primaryKey, $columns, null, 'idUser = '.$this->getAuthService()->getIdentity()->id);
         foreach ($return['data'] as &$item) {
             foreach ($item as &$i)
                 $i = utf8_encode($i);

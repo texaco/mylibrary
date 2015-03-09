@@ -23,6 +23,7 @@ class Album {
     public $seen;           // ALREADY SEEN OR PENDING.
     public $registerDate;   // REGISTER DATE
     public $editDate;       // EDITED DATE
+    public $idUser;         // USER OWNER
     
     protected $inputFilter;
 
@@ -36,6 +37,7 @@ class Album {
         $this->seen = (!empty($data['seen'])) ? $data['seen'] : null;
         $this->registerDate = (!empty($data['registerDate'])) ? $data['registerDate'] : null;
         $this->editDate = (!empty($data['editDate'])) ? $data['editDate'] : null;
+        $this->idUser = (!empty($data['idUser'])) ? $data['idUser'] : null;
     }
 
     // Hace serializable el objeto. Necesario para copiar los parametros desde la edición.
@@ -180,6 +182,14 @@ class Album {
                             'max' => 100,
                         ),
                     ),
+                ),
+            ));
+
+            $inputFilter->add(array(
+                'name' => 'idUser',
+                'required' => true,
+                'filters' => array(
+                    array('name' => 'Int'),
                 ),
             ));
 

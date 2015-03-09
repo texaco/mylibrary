@@ -12,7 +12,7 @@ class HomeController extends AbstractActionController {
     protected $authDbAdapter;
     protected $authService;
 
-    public function getAuthDbAdapter() {
+    private function getAuthDbAdapter() {
         if (!$this->authDbAdapter) {
             $sm = $this->getServiceLocator();
             $this->authDbAdapter= $sm->get('AuthDbAdapter');
@@ -20,7 +20,7 @@ class HomeController extends AbstractActionController {
         return $this->authDbAdapter;
     }
 
-    public function getAuthService() {
+    private function getAuthService() {
         if (!$this->authService) {
             $sm = $this->getServiceLocator();
             $this->authService= $sm->get('Album\Service\AuthServiceInterface');
@@ -48,7 +48,7 @@ class HomeController extends AbstractActionController {
                 $result = $this->getAuthService()->authenticate($this->getAuthDbAdapter());
                 if($result->isValid()){
                     $storage = $this->getAuthService()->getStorage();
-                    $storage->write($this->getAuthDbAdapter()->getResultRowObject(array('email', 'rol')));
+                    $storage->write($this->getAuthDbAdapter()->getResultRowObject(array('id', 'email', 'rol')));
                     return $this->redirect()->toRoute('album');
                 }
                 else{

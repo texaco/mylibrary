@@ -87,6 +87,10 @@ class AlbumForm extends Form {
                 'class' => 'form-control',
             ),
         ));
+        $this->add(array(
+            'name' => 'idUser',
+            'type' => 'Hidden',
+        ));
 
         $this->add(array(
             'name' => 'submit',

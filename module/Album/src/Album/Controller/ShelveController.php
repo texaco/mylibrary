@@ -74,6 +74,7 @@ class ShelveController extends AbstractActionController {
             $form = new ShelveForm();
             $form->get('submit')->setValue('Add');
             $form->get('submitAndContinue')->setValue('Add and Continue');
+            $form->get('idUser')->setValue($this->getAuthService()->getIdentity()->id);
 
             return array('form' => $form);
         }
@@ -213,7 +214,7 @@ class ShelveController extends AbstractActionController {
          * server-side, there is no need to edit below this line.
          */
 
-        $return = $this->getDataTable()->simple($this->params()->fromQuery(), $sql_details, $table, $primaryKey, $columns);
+        $return = $this->getDataTable()->complex($this->params()->fromQuery(), $sql_details, $table, $primaryKey, $columns, null, 'idUser = '.$this->getAuthService()->getIdentity()->id);
         foreach ($return['data'] as &$item) {
             foreach ($item as &$i) {
                 $i = utf8_encode($i);

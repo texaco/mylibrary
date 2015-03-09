@@ -18,8 +18,11 @@ class PlatformTable {
         $this->tableGateway = $tableGateway;
     }
 
-    public function fetchAll() {
-        $resultSet = $this->tableGateway->select();
+    public function fetchAll($idUser) {
+        $select = $this->tableGateway->getSql()->select();
+        $conditions = array('idUser' => $idUser);
+        $select->where($conditions);
+        $resultSet = $this->tableGateway->selectWith($select);
         return $resultSet;
     }
 
@@ -37,6 +40,7 @@ class PlatformTable {
         $data = array(
             'name' => $platform->name,
             'description' => $platform->description,
+            'idUser' => $platform->idUser,
         );
 
         $id = (int) $platform->id;

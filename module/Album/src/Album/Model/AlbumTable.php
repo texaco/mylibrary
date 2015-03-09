@@ -18,8 +18,11 @@ class AlbumTable {
         $this->tableGateway = $tableGateway;
     }
 
-    public function fetchAll() {
-        $resultSet = $this->tableGateway->select();
+    public function fetchAll($idUser) {
+        $select = $this->tableGateway->getSql()->select();
+        $conditions = array('idUser' => $idUser);
+        $select->where($conditions);
+        $resultSet = $this->tableGateway->selectWith($select);
         return $resultSet;
     }
 
@@ -67,6 +70,7 @@ class AlbumTable {
             'shelve' => $album->shelve,
             'cover' => $album->cover,
             'seen' => $album->seen,
+            'idUser' => $album->idUser,
         );
 
         $id = (int) $album->id;

@@ -17,12 +17,15 @@ class Shelve {
     public $id;
     public $name;         // NAME OF THE SHELVE
     public $description;          // DESCRIPTION OF THE SHELVE
+    public $idUser;         // USER OWNER
+
     protected $inputFilter;
 
     public function exchangeArray($data) {
         $this->id = (!empty($data['id'])) ? $data['id'] : null;
         $this->name = (!empty($data['name'])) ? $data['name'] : null;
         $this->description = (!empty($data['description'])) ? $data['description'] : null;
+        $this->idUser = (!empty($data['idUser'])) ? $data['idUser'] : null;
     }
 
     // Hace serializable el objeto. Necesario para copiar los parametros desde la edición.
@@ -82,6 +85,14 @@ class Shelve {
                             'max' => 100,
                         ),
                     ),
+                ),
+            ));
+
+            $inputFilter->add(array(
+                'name' => 'idUser',
+                'required' => true,
+                'filters' => array(
+                    array('name' => 'Int'),
                 ),
             ));
 

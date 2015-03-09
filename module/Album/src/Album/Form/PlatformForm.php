@@ -42,6 +42,11 @@ class PlatformForm extends Form {
         ));
         
         $this->add(array(
+            'name' => 'idUser',
+            'type' => 'Hidden',
+        ));
+
+        $this->add(array(
             'name' => 'submit',
             'type' => 'Submit',
             'attributes' => array(
