@@ -5,7 +5,9 @@ namespace Album\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Album\Model\Album;
+use Album\Model\AlbumImport;
 use Album\Form\AlbumForm;
+use Album\Form\AlbumImportForm;
 use Zend\View\Model\JsonModel;
 
 class AlbumController extends AbstractActionController {
@@ -47,7 +49,7 @@ class AlbumController extends AbstractActionController {
 
         foreach ($albums as $album) {
             $titles[] = $album->title;
-            $artists[] = $album->artist;
+            $artists[] = $album->albumsToImport;
             $seens[] = $album->seen;
         }
         return array('titles' => array_unique($titles), 'artists' => array_unique($artists), 'seens' => array_unique($seens),);
@@ -195,9 +197,9 @@ class AlbumController extends AbstractActionController {
     }
 
     public function deleteAction() {
-        if($this->hasPrivilege()){
-            
-        $id = (int) $this->params()->fromRoute('id', 0);
+        if ($this->hasPrivilege()) {
+
+            $id = (int) $this->params()->fromRoute('id', 0);
             if (!$id) {
                 return $this->redirect()->toRoute('album');
             }
@@ -226,12 +228,11 @@ class AlbumController extends AbstractActionController {
     public function indexAction() {
         if ($this->hasPrivilege()) {
             //$this->getPlatformOptions();
-            return array('platforms' => $this->getPlatformOptions(), 
+            return array('platforms' => $this->getPlatformOptions(),
                 'idUser' => $this->getAuthService()->getIdentity()->id);
         }
         $this->redirect()->toRoute('home', array('action' => 'logout'));
         return array('form' => new \Album\Form\HomeForm(), 'error_msg' => 'No identity found');
-            
     }
 
     private function hasPrivilege($resource = 'Album') {
@@ -302,12 +303,63 @@ class AlbumController extends AbstractActionController {
          * server-side, there is no need to edit below this line.
          */
 
-        $return = $this->getDataTable()->complex($this->params()->fromQuery(), $sql_details, $table, $primaryKey, $columns, null, 'idUser = '.$this->getAuthService()->getIdentity()->id);
+        $return = $this->getDataTable()->complex($this->params()->fromQuery(), $sql_details, $table, $primaryKey, $columns, null, 'idUser = ' . $this->getAuthService()->getIdentity()->id);
         foreach ($return['data'] as &$item) {
             foreach ($item as &$i)
                 $i = utf8_encode($i);
         }
         return new JsonModel($return);
+    }
+
+    public function importAction() {
+        if ($this->hasPrivilege()) {
+
+            $albumsToImportForm = new AlbumImportForm();
+
+            $request = $this->getRequest();
+            if ($request->isPost()) {
+
+                // Split into single array albums
+                // Iterate and save those albums
+                $albumsToImport = new AlbumImport();
+                $albumsToImportForm->setInputFilter($albumsToImport->getInputFilter());
+                $albumsToImportForm->setData($request->getPost());
+
+                if ($albumsToImportForm->isValid()) {
+                    $albumsToImport->exchangeArray($albumsToImportForm->getData());
+
+                    $albumsToImportArray = explode(PHP_EOL, $albumsToImport->albumsToImport);
+
+                    foreach ($albumsToImportArray as $album) {
+                        $field = explode('|', trim($album));
+
+                        if (count($field) == 6) {
+                            $albumModel = new Album();
+                            $albumModel->title = trim($field[0]);
+                            $albumModel->artist = trim($field[1]);
+                            $albumModel->platform = trim($field[2]);
+                            $albumModel->shelve = trim($field[3]);
+                            $albumModel->cover = trim($field[4]);
+                            $albumModel->seen = trim($field[5]);
+                            $albumModel->idUser = $this->authService->getIdentity()->id;
+
+                            $this->getAlbumTable()->saveAlbum($albumModel);
+                        } else {
+                            $error_msg = 'Number of fields is wrong.';
+                        }
+                    }
+                    if (!$error_msg) {
+                        $success_msg = 'Everything seem good.';
+                    }
+                } else {
+                    $error_msg = 'Validation went wrong.';
+                }
+            }
+
+            return array('form' => $albumsToImportForm, 'error_msg' => $error_msg, 'success_msg' => $success_msg);
+        }
+        $this->redirect()->toRoute('home', array('action' => 'logout'));
+        return array('form' => new \Album\Form\HomeForm(), 'error_msg' => 'No identity found');
     }
 
 }

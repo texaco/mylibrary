@@ -1,0 +1,37 @@
+<?php
+// module/Album/view/album/album/import.phtml:
+
+$title = 'Add new albums';
+$this->headTitle($title);
+?>
+
+<h1><?php echo $this->escapeHtml($title); ?></h1>
+<?php if($this->error_msg){ ?>
+<div class="alert alert-danger" role="alert"><?php echo $this->translate($this->error_msg);?></div>
+<?php } ?>
+<?php if($this->success_msg){ ?>
+<div class="alert alert-success" role="alert"><?php echo $this->translate($this->success_msg);?></div>
+<?php } ?>
+<p><?php echo $this->translate('So hello. It seems like you are trying to import a bunch of good stuff (or not, it is up to you). So you should know that this is the format to go...'); ?></p>
+<pre>
+Title 1|Artist 1|Platform 1|Shelve 1|URL Cover 1|Seen by 1
+Title 2|Artist 2|Platform 2|Shelve 2|URL Cover 2|Seen by 2
+...
+Title n|Artist n|Platform n|Shelve n|URL Cover n|Seen by n
+</pre>
+<p><?php echo $this->translate('For instance, this could be a good example of what I am talking about:'); ?></p>
+<pre>
+Mario Kart 8|Nitendo|WII U|My Shelve|http://and.url/cover.png|none
+Luigis Mansion|Nintendo|3DS|My other shelve|http://and.url/luigis_cover.png|Me
+</pre>
+<p><?php echo $this->translate('Give it a try!'); ?></p>
+
+<?php
+$form->setAttribute('action', $this->url('album', array('action' => 'import')));
+$form->prepare();
+
+echo $this->form()->openTag($form);
+
+echo $this->formCollection($form);
+
+echo $this->form()->closeTag();

@@ -64,8 +64,8 @@ class AlbumTable {
 
     public function saveAlbum(Album $album) {
         $data = array(
-            'artist' => $album->artist,
             'title' => $album->title,
+            'artist' => $album->artist,
             'platform' => $album->platform,
             'shelve' => $album->shelve,
             'cover' => $album->cover,
