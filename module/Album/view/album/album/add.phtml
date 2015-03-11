@@ -8,17 +8,17 @@ $this->headTitle($title);
      $(function() {
         var availableTitles = [
             <?php foreach ($search_array['titles'] as $albumTitle) :?>
-            "<?php echo $albumTitle ?>",
+            "<?php echo trim($albumTitle) ?>",
             <?php endforeach;?>
         ];
         var availableArtists = [
             <?php foreach ($search_array['artists'] as $albumArtist) :?>
-            "<?php echo $albumArtist ?>",
+            "<?php echo trim($albumArtist) ?>",
             <?php endforeach;?>
         ];
         var availableSeens = [
             <?php foreach ($search_array['seens'] as $albumSeens) :?>
-            "<?php echo $albumSeens ?>",
+            "<?php echo trim($albumSeens) ?>",
             <?php endforeach;?>
         ];
         $("#title").autocomplete({
@@ -31,6 +31,13 @@ $this->headTitle($title);
             source: availableSeens
         });
     });
+    $(document).ready(function(){
+            $('#title').on('change', null, function(){
+                console.log(this.value);
+                var selector = '<br/><div class="alert alert-info" role="alert"><a target="_blank" href="http://www.google.com?q=' + this.value + '"><?php echo $this->translate("Search for:");?> '+ this.value + '</a></div>';
+                console.log(selector);
+                $(selector).insertAfter('#title');});
+        });
 </script>
 
 
